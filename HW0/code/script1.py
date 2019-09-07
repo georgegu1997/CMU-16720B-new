@@ -14,12 +14,6 @@ blue = np.load("../data/blue.npy")
 rgbResultSSD = alignChannels(red, green, blue, alignTwoSSD)
 rgbResultNCC = alignChannels(red, green, blue, alignTwoNCC)
 
-plt.subplot(121)
-plt.imshow(rgbResultSSD)
-plt.subplot(122)
-plt.imshow(rgbResultNCC)
-plt.show()
-
 # 3. save result to rgb_output.jpg (IN THE "results" FOLDER)
 plt.imsave("../results/rgbResultSSD.png", rgbResultSSD)
 plt.imsave("../results/rgbResultNCC.png", rgbResultNCC)
