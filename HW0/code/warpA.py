@@ -7,7 +7,7 @@ def warp(im, A, output_shape):
     Uses nearest neighbor interpolation."""
 
     # Get the mesh grid
-    xx, yy = np.meshgrid(np.arange(output_shape[0]), np.arange(output_shape[1])) # x coordinate first
+    yy, xx = np.meshgrid(np.arange(output_shape[1]), np.arange(output_shape[0])) # x coordinate first
     grid = np.stack((xx, yy), axis=-1)
     grid = grid.reshape((-1, 2)).T
     P_dst = np.vstack((grid, np.ones((1, grid.shape[1]))))
@@ -28,6 +28,6 @@ def warp(im, A, output_shape):
     # Index the input image to get the output warped image
     warped = np.zeros(output_shape).flatten()
     warped[valid_ind] = im[valid_P_src[0], valid_P_src[1]]
-    warped = warped.reshape(output_shape[::-1]).T
+    warped = warped.reshape(output_shape)
 
     return warped
