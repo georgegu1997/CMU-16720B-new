@@ -24,15 +24,33 @@ def extract_filter_responses(image):
 
     # ----- TODO -----
     # Convert the image to float type between 0 and 1
-    print("image.dtype:", image.dtype)
+    print("input image dtype:", image.dtype)
     if image.dtype == np.uint8 or image.max() > 10:
         image = image.astype(float) / 255.0
     # Check and convert the dimensions
     print("input image shape:", image.shape)
-    if image.ndim = 2:
+    if image.ndim == 2:
         image = np.stack([image]*3, axis=2)
 
+    # Convert the image to Lab color space
+    image = skimage.color.rgb2lab(image)
 
+    H, W, _ = image.shape
+    filter_responses = []
+
+    for s in FILTER_SCALES: # iterate over scales
+        for c in range(3): # iterate over channels
+            # Gaussian
+            filter_responses.append(scipy.ndimage.gaussian_filter(image[:,:,c], sigma=s))
+            # Laplacian of Gaussian
+            filter_responses.append(scipy.ndimage.gaussian_laplace(image[:,:,c], sigma=s))
+            # x derivative of Gaussian
+            filter_responses.append(scipy.ndimage.gaussian_filter(image[:,:,c], sigma=s, order=[0,1]))
+            # y derivative of Gaussian
+            filter_responses.append(scipy.ndimage.gaussian_filter(image[:,:,c], sigma=s, order=[1,0]))
+
+    filter_responses = np.stack(filter_responses, axis=2)
+    print(filter_responses.shape)
 
     return filter_responses
 
