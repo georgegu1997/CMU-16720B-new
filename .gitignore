@@ -2,3 +2,7 @@
 */data/*
 */submission/*
 **/__pycache__
+*/report/*
+!*/report/*.pdf
+!*/report/*.tex
+!*/report/*.bib

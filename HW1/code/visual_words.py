@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import util
 import random
 
+FILTER_SCALES = [1, 2, 4, 8, 8*np.sqrt(2)]
+
 def extract_filter_responses(image):
     '''
     Extracts the filter responses for the given image.
@@ -21,8 +23,18 @@ def extract_filter_responses(image):
     '''
 
     # ----- TODO -----
-    
-    pass
+    # Convert the image to float type between 0 and 1
+    print("image.dtype:", image.dtype)
+    if image.dtype == np.uint8 or image.max() > 10:
+        image = image.astype(float) / 255.0
+    # Check and convert the dimensions
+    print("input image shape:", image.shape)
+    if image.ndim = 2:
+        image = np.stack([image]*3, axis=2)
+
+
+
+    return filter_responses
 
 def get_visual_words(image, dictionary):
     '''
@@ -36,7 +48,7 @@ def get_visual_words(image, dictionary):
     '''
 
     # ----- TODO -----
-    
+
     pass
 
 
@@ -57,7 +69,7 @@ def compute_dictionary_one_image(args):
 
     i, alpha, image_path = args
     # ----- TODO -----
-    
+
     pass
 
 def compute_dictionary(num_workers=2):
@@ -73,7 +85,5 @@ def compute_dictionary(num_workers=2):
 
     train_data = np.load("../data/train_data.npz")
     # ----- TODO -----
-    
+
     pass
-
-
