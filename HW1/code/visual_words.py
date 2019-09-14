@@ -10,6 +10,7 @@ import util
 import random
 
 FILTER_SCALES = [1, 2, 4, 8, 8*np.sqrt(2)]
+TEMP_ROOT_SAMPLED_RESPONSE = "../temp/response/"
 
 def extract_filter_responses(image):
     '''
@@ -37,15 +38,19 @@ def extract_filter_responses(image):
     filter_responses = []
 
     for s in FILTER_SCALES: # iterate over scales
-        for c in range(3): # iterate over channels
-            # Laplacian of Gaussian
-            filter_responses.append(scipy.ndimage.gaussian_laplace(image[:,:,c], sigma=s))
+        for c in range(3): 
             # Gaussian
             filter_responses.append(scipy.ndimage.gaussian_filter(image[:,:,c], sigma=s))
+        for c in range(3):
+            # Laplacian of Gaussian
+            filter_responses.append(scipy.ndimage.gaussian_laplace(image[:,:,c], sigma=s))
+        for c in range(3):
             # x derivative of Gaussian
-            filter_responses.append(scipy.ndimage.gaussian_filter(image[:,:,c], sigma=s, order=[1,0]))
+            filter_responses.append(scipy.ndimage.gaussian_filter(image[:,:,c], sigma=s, order=[0, 1]))
+        for c in range(3):
             # y derivative of Gaussian
-            filter_responses.append(scipy.ndimage.gaussian_filter(image[:,:,c], sigma=s, order=[0,1]))
+            filter_responses.append(scipy.ndimage.gaussian_filter(image[:,:,c], sigma=s, order=[1, 0]))
+
 
     filter_responses = np.stack(filter_responses, axis=2)
     return filter_responses
@@ -56,14 +61,24 @@ def get_visual_words(image, dictionary):
 
     [input]
     * image: numpy.ndarray of shape (H, W) or (H, W, 3)
+    * dictionary: numpy.ndarray of shape (K, 3F)
 
     [output]
     * wordmap: numpy.ndarray of shape (H, W)
     '''
 
     # ----- TODO -----
+    # extract the filter responses
+    filter_responses = extract_filter_responses(image) # Will be (H, W, 3F)
+    H, W, _ = filter_responses.shape
+    filter_responses = filter_responses.reshape(H*W, -1)
 
-    pass
+    # Compute the distance and assign label
+    visual_words = scipy.spatial.distance.cdist(filter_responses, dictionary, metric='euclidean') # Will be (H*W, K)
+    visual_words = np.argmax(visual_words, axis = 1)
+    visual_words = visual_words.reshape((H, W))
+
+    return visual_words
 
 
 def compute_dictionary_one_image(args):
@@ -80,11 +95,22 @@ def compute_dictionary_one_image(args):
     * sampled_response: numpy.ndarray of shape (alpha, 3F)
     '''
 
-
     i, alpha, image_path = args
     # ----- TODO -----
+    image = skimage.io.imread(image_path)
+    image = image.astype('float')/255
+    filter_responses = extract_filter_responses(image)
+    H, W, _ = image.shape
 
-    pass
+    # Flatten the pixels for sampling.
+    filter_responses = filter_responses.reshape([H*W, -1])
+    sample_indices = np.random.choice(H*W, alpha, replace=False)
+    sampled_response = filter_responses[sample_indices]
+
+    print("processed image %d" % i)
+
+    # Save the sampled_response
+    np.save(os.path.join(TEMP_ROOT_SAMPLED_RESPONSE, "%d"%i), sampled_response)
 
 def compute_dictionary(num_workers=2):
     '''
@@ -99,5 +125,37 @@ def compute_dictionary(num_workers=2):
 
     train_data = np.load("../data/train_data.npz")
     # ----- TODO -----
+    ALPHA = 275
+    K = 200
+    image_paths = train_data['files']
+    image_labels = train_data['labels']
 
-    pass
+    # Construct the batches for multiprocessing pool
+    batches = []
+    for i, p in enumerate(image_paths):
+        image_path = os.path.join("../data/", p)
+        batches.append((i, ALPHA, image_path))
+
+    # multiprocessing on compute_dictionary_one_image
+    pool = multiprocessing.Pool(num_workers)
+    pool.map(compute_dictionary_one_image, batches)
+    print("compute_dictionary: All the responses are saved")
+
+    # Read the responses and perform the K-Means algorithm
+    response_paths = [os.path.join(TEMP_ROOT_SAMPLED_RESPONSE, f) \
+        for f in os.listdir(TEMP_ROOT_SAMPLED_RESPONSE) \
+        if os.path.isfile(os.path.join(TEMP_ROOT_SAMPLED_RESPONSE, f))]
+
+    # concatenate it to a large array for training
+    responses = []
+    for response_path in response_paths:
+        responses.append(np.load(response_path))
+    responses = np.concatenate(responses, axis = 0)
+    print("responses.shape:", responses.shape)
+
+    # Run the K-Means algorithm
+    kmeans = sklearn.cluster.KMeans(n_clusters=K, n_jobs=-1).fit(responses)
+    dictionary = kmeans.cluster_centers_
+    print("dictionary.shape:", dictionary.shape)
+
+    np.save("dictionary", dictionary)

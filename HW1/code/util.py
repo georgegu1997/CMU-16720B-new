@@ -32,7 +32,7 @@ def get_VGG16_weights():
         if isinstance(layer,torch.nn.MaxPool2d):
             l = ["maxpool2d",layer.kernel_size]
         vgg16_weights.append(l)
-    
+
     for layer in vgg16.classifier:
         if isinstance(layer,torch.nn.Linear):
             l = ["linear",layer.weight.detach().numpy(),layer.bias.detach().numpy()]
