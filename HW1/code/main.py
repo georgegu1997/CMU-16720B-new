@@ -23,13 +23,12 @@ if __name__ == '__main__':
     # visual_words.compute_dictionary(num_workers=num_cores)
 
     '''q1.3 Get visual codes using the dictionary'''
-    path_img = "../data/aquarium/sun_aairflxfskjrkepm.jpg"
+    path_img = "../data/desert/sun_bvlihuzwolttdrnn.jpg"
     image = skimage.io.imread(path_img)
     image = image.astype('float')/255
 
     dictionary = np.load('dictionary.npy')
     img = visual_words.get_visual_words(image,dictionary)
-    print(np.unique(img, return_counts=True))
     plt.subplot(121)
     plt.imshow(image)
     plt.subplot(122)

@@ -38,7 +38,7 @@ def extract_filter_responses(image):
     filter_responses = []
 
     for s in FILTER_SCALES: # iterate over scales
-        for c in range(3): 
+        for c in range(3):
             # Gaussian
             filter_responses.append(scipy.ndimage.gaussian_filter(image[:,:,c], sigma=s))
         for c in range(3):
@@ -75,7 +75,7 @@ def get_visual_words(image, dictionary):
 
     # Compute the distance and assign label
     visual_words = scipy.spatial.distance.cdist(filter_responses, dictionary, metric='euclidean') # Will be (H*W, K)
-    visual_words = np.argmax(visual_words, axis = 1)
+    visual_words = np.argmin(visual_words, axis = 1)
     visual_words = visual_words.reshape((H, W))
 
     return visual_words
