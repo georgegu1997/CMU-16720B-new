@@ -24,9 +24,28 @@ def build_recognition_system(num_workers=2):
     train_data = np.load("../data/train_data.npz")
     dictionary = np.load("dictionary.npy")
     # ----- TODO -----
+    SPM_layer_num = 3
+    K = dictionary.shape[0]
+    image_paths = train_data['files']
+    image_labels = train_data['labels']
 
-    pass
+    # Construct the batches for multiprocessing pool
+    batches = []
+    for i, p in enumerate(image_paths):
+        image_path = os.path.join("../data/", p)
+        batches.append((image_path, dictionary, SPM_layer_num, K))
 
+    # Extract the image feature using multiprocessing
+    pool = multiprocessing.Pool(num_workers)
+    print("Multiprocessing start for get_image_feature()...", end=" ")
+    features = pool.starmap(get_image_feature, batches)
+    print("Done")
+
+    features = np.stack(features, axis = 0)
+    print("features.shape:", features.shape)
+
+    # Save the results
+    np.savez("trained_system.npz", features=features, labels=image_labels, dictionary=dictionary, SPM_layer_num=SPM_layer_num)
 
 def evaluate_recognition_system(num_workers=2):
     '''
@@ -47,7 +66,6 @@ def evaluate_recognition_system(num_workers=2):
 
     pass
 
-
 def get_image_feature(file_path, dictionary, layer_num, K):
     '''
     Extracts the spatial pyramid matching feature.
@@ -62,8 +80,15 @@ def get_image_feature(file_path, dictionary, layer_num, K):
     * feature: numpy.ndarray of shape (K*(4^layer_num-1)/3)
     '''
     # ----- TODO -----
+    # Read the image
+    image = skimage.io.imread(file_path)
+    image = image.astype('float')/255
 
-    pass
+    # Get the Get the SPM feature and return it
+    wordmap = visual_words.get_visual_words(image, dictionary)
+    feature = get_feature_from_wordmap_SPM(wordmap, layer_num, K)
+
+    return feature
 
 
 def distance_to_set(word_hist, histograms):
@@ -78,8 +103,11 @@ def distance_to_set(word_hist, histograms):
     * sim: numpy.ndarray of shape (N)
     '''
     # ----- TODO -----
+    N, K  = histograms.shape
+    minimum = np.minimum(word_hist.reshape((1, K)), histograms)
+    sim = minimum.sum(axis = 1)
 
-    pass
+    return sim
 
 
 def get_feature_from_wordmap(wordmap, dict_size):
