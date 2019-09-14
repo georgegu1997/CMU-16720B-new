@@ -42,6 +42,12 @@ if __name__ == '__main__':
     # print(hist.shape)
     # print(hist.sum())
 
+    '''q2.2 test get_feature_from_wordmap_SPM'''
+    dictionary = np.load('dictionary.npy')
+    img = visual_words.get_visual_words(image,dictionary)
+    hist = visual_recog.get_feature_from_wordmap_SPM(img, 3, dictionary.shape[0])
+
+
     # visual_recog.build_recognition_system(num_workers=num_cores)
 
     #conf, accuracy = visual_recog.evaluate_recognition_system(num_workers=num_cores)

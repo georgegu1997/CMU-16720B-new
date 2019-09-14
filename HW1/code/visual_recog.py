@@ -109,7 +109,7 @@ def get_feature_from_wordmap_SPM(wordmap, layer_num, dict_size):
 
     [input]
     * wordmap: numpy.ndarray of shape (H, W)
-    * layer_num: number of spatial pyramid layers
+    * layer_num: number of spatial pyramid layers L+1
     * dict_size: dictionary size K
 
     [output]
@@ -117,5 +117,48 @@ def get_feature_from_wordmap_SPM(wordmap, layer_num, dict_size):
     '''
 
     # ----- TODO -----
+    hist_all = []
+    L = layer_num - 1
+    K = dict_size
 
-    pass
+    # The sizes are from 1/1 to 1/(2^L)
+    # split the image to grid on the finest level
+    H, W = wordmap.shape
+    finest_shape = (int(H / (2**L)), int(W / (2**L)))
+    finest_image_grid = skimage.util.view_as_windows(wordmap, finest_shape, step=finest_shape)
+    # print(finest_image_grid.shape) # (4, 4, 93, 125)
+
+    # Compute the histgram on the finest level
+    finest_image_list = finest_image_grid.reshape(( (2**L)*(2**L) , *finest_shape))
+    finest_hist_list = []
+    for w in finest_image_list:
+        finest_hist_list.append(get_feature_from_wordmap(w, dict_size))
+    finest_hist_list = np.stack(finest_hist_list, axis = 0)
+    finest_hist_grid = finest_hist_list.reshape(((2**L), (2**L), dict_size))
+
+    # Compute, normalize and append the histgram for each level
+    for l in range(L, -1, -1):
+        s = int((2**L) / (2**l)) # size of this level in term of finest_window
+        hist_grid = skimage.util.view_as_windows(finest_hist_grid, (s, s, dict_size), step = (s, s, dict_size))
+        # eliminate the extra dimension
+        hist_grid = np.squeeze(hist_grid, axis = 2)
+        # Sum up the histograms that are in a region of several finest grid
+        hist_grid = hist_grid.sum(axis = (2, 3))
+        # normalize histograms in all window in this level (Then they sum up to 1)
+        hist_grid = hist_grid / (4**L)
+
+        # Flatten and L1 normalize
+        if l == 0 or l == 1:
+            normalize_factor = 2**(-L)
+        else:
+            normalize_factor = (2**(l-L-1))
+        hist_list = hist_grid.reshape((-1, dict_size)) * normalize_factor
+        hist_all.append(hist_list)
+
+    # concatenate all the features and Flatten them
+    hist_all = np.concatenate(hist_all, axis = 0)
+    hist_all = hist_all.reshape(-1)
+    # print(hist_all.shape)
+    # print(K * (4**(L+1)-1) / 3)
+    # print(hist_all.sum())
+    return hist_all
