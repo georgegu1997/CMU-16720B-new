@@ -7,6 +7,14 @@ import visual_recog
 import deep_recog
 import skimage
 
+def getVisualWordAndSave(path_img, save_path):
+    image = skimage.io.imread(path_img)
+    image = image.astype('float')/255
+    dictionary = np.load('dictionary.npy')
+    img = visual_words.get_visual_words(image,dictionary)
+    plt.imsave(save_path + "image.png", image)
+    plt.imsave(save_path + "wordmap.png", img, cmap=plt.get_cmap('gist_rainbow'))
+
 if __name__ == '__main__':
     num_cores = util.get_num_CPU()
 
@@ -24,16 +32,7 @@ if __name__ == '__main__':
 
     '''q1.3 Get visual codes using the dictionary'''
     path_img = "../data/desert/sun_bvlihuzwolttdrnn.jpg"
-    image = skimage.io.imread(path_img)
-    image = image.astype('float')/255
-
-    dictionary = np.load('dictionary.npy')
-    img = visual_words.get_visual_words(image,dictionary)
-    plt.subplot(121)
-    plt.imshow(image)
-    plt.subplot(122)
-    plt.imshow(img, cmap=plt.get_cmap('gist_rainbow'))
-    plt.show()
+    getVisualWordAndSave(path_img, "../results/q1_3_first")
 
     # util.save_wordmap(wordmap, filename)
     # visual_recog.build_recognition_system(num_workers=num_cores)
