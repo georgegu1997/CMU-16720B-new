@@ -24,7 +24,7 @@ def build_recognition_system(num_workers=2):
     train_data = np.load("../data/train_data.npz")
     dictionary = np.load("dictionary.npy")
     # ----- TODO -----
-    
+
     pass
 
 
@@ -95,8 +95,12 @@ def get_feature_from_wordmap(wordmap, dict_size):
     '''
 
     # ----- TODO -----
-    
-    pass
+    word = wordmap.reshape(-1)
+
+    # the values in the word will be from 0 to K-1
+    hist, _ = np.histogram(word, bins=np.arange(dict_size+1)-0.5, density=True)
+
+    return hist
 
 
 def get_feature_from_wordmap_SPM(wordmap, layer_num, dict_size):
@@ -113,5 +117,5 @@ def get_feature_from_wordmap_SPM(wordmap, layer_num, dict_size):
     '''
 
     # ----- TODO -----
-    
+
     pass

@@ -13,7 +13,7 @@ def getVisualWordAndSave(path_img, save_path):
     dictionary = np.load('dictionary.npy')
     img = visual_words.get_visual_words(image,dictionary)
     plt.imsave(save_path + "image.png", image)
-    plt.imsave(save_path + "wordmap.png", img, cmap=plt.get_cmap('gist_rainbow'))
+    plt.imsave(save_path + "_wordmap.png", img, cmap=plt.get_cmap('gist_rainbow'))
 
 if __name__ == '__main__':
     num_cores = util.get_num_CPU()
@@ -31,10 +31,17 @@ if __name__ == '__main__':
     # visual_words.compute_dictionary(num_workers=num_cores)
 
     '''q1.3 Get visual codes using the dictionary'''
-    path_img = "../data/desert/sun_bvlihuzwolttdrnn.jpg"
-    getVisualWordAndSave(path_img, "../results/q1_3_first")
+    # path_img = "../data/desert/sun_bvlihuzwolttdrnn.jpg"
+    # getVisualWordAndSave(path_img, "../results/q1_3_first")
 
-    # util.save_wordmap(wordmap, filename)
+    '''q2.1 test get_feature_from_wordmap'''
+    # dictionary = np.load('dictionary.npy')
+    # img = visual_words.get_visual_words(image,dictionary)
+    # hist = visual_recog.get_feature_from_wordmap(img, dictionary.shape[0])
+    # print(hist)
+    # print(hist.shape)
+    # print(hist.sum())
+
     # visual_recog.build_recognition_system(num_workers=num_cores)
 
     #conf, accuracy = visual_recog.evaluate_recognition_system(num_workers=num_cores)
