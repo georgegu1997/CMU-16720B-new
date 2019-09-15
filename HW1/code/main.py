@@ -67,10 +67,25 @@ if __name__ == '__main__':
     0.64375
     '''
 
-    '''q3.1'''
-    vgg16 = torchvision.models.vgg16(pretrained=True).double()
-    vgg16.eval()
-    deep_recog.build_recognition_system(vgg16,num_workers=num_cores//2)
+    '''q3.1 Test the network_layers'''
+    import network_layers
+    import torch.nn
+    x = image
+    print("x.shape:", x.shape)
+    y = network_layers.max_pool2d(x, 2)
+    pool = torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+    y_torch = pool(torch.from_numpy(x.transpose((2, 0, 1))))
+    print("y.shape:", y.shape)
+    print("y_torch.shape:", y_torch.shape)
+
+    # vgg16 = torchvision.models.vgg16(pretrained=True).double()
+    # print(vgg16)
+
+
+
+    # vgg16 = torchvision.models.vgg16(pretrained=True).double()
+    # vgg16.eval()
+    # deep_recog.build_recognition_system(vgg16,num_workers=num_cores//2)
 
     #conf = deep_recog.evaluate_recognition_system(vgg16,num_workers=num_cores//2)
     #print(conf)

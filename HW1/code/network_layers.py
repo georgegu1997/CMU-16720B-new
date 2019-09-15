@@ -60,6 +60,10 @@ def relu(x):
 
 	return y
 
+# References:
+# https://ipython-books.github.io/46-using-stride-tricks-with-numpy/
+# https://ipython-books.github.io/47-implementing-an-efficient-rolling-average-algorithm-with-stride-tricks/
+# The max pooling used by vgg16 is MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
 def max_pool2d(x, size):
 	'''
 	2D max pooling operation.
@@ -74,8 +78,16 @@ def max_pool2d(x, size):
 	H, W, input_dim = x.shape
 	H_out = H//size
 	W_out = W//size
-	
-	pass
+
+	# Sliding window using stride tricks
+	xy_strides = np.array(x.strides)[:2] * size
+	new_strides = tuple(xy_strides) + x.strides # Tuple addition = concatenation
+	new_shape = (H_out, W_out, size, size, input_dim)
+	rolling_x = np.lib.stride_tricks.as_strided(x, shape=new_shape, strides=new_strides)
+
+	y = np.amax(rolling_x, axis=(2, 3))
+
+	return y
 
 def linear(x,W,b):
 	'''
