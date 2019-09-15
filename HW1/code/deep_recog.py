@@ -25,7 +25,7 @@ def build_recognition_system(vgg16, num_workers=2):
 	train_data = np.load("../data/train_data.npz")
 
 	# ----- TODO -----
-	
+
 	pass
 
 
@@ -81,7 +81,7 @@ def get_image_feature(args):
 	i, image_path, vgg16 = args
 
 	# ----- TODO -----
-
+	
 	pass
 
 

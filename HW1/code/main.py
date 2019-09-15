@@ -72,19 +72,30 @@ if __name__ == '__main__':
     import torch.nn
     x = image
     print("x.shape:", x.shape)
-    y = network_layers.max_pool2d(x, 2)
-    pool = torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
-    y_torch = pool(torch.from_numpy(x.transpose((2, 0, 1))))
-    y_torch = y_torch.detach().numpy()
-    y_torch = y_torch.transpose((1, 2, 0))
-    print("y.shape:", y.shape)
-    print("y_torch.shape:", y_torch.shape)
-    print(np.linalg.norm(y-y_torch))
+    '''test the multichannel_conv2d'''
+    weights = util.get_VGG16_weights()
+    # print(weights[0]) # Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    conv_w = weights[0][1]
+    conv_b = weights[0][2]
+    print(conv_w.shape)
+    print(conv_b.shape)
+    y = network_layers.multichannel_conv2d(x, conv_w, conv_b)
+    print(y.shape)
+
+    '''test the max_pool2d'''
+    # y = network_layers.max_pool2d(x, 2)
+    # pool = torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+    # y_torch = pool(torch.from_numpy(x.transpose((2, 0, 1))))
+    # y_torch = y_torch.detach().numpy()
+    # y_torch = y_torch.transpose((1, 2, 0))
+
+    '''The metrics for comparison'''
+    # print("y.shape:", y.shape)
+    # print("y_torch.shape:", y_torch.shape)
+    # print(np.linalg.norm(y-y_torch))
 
     # vgg16 = torchvision.models.vgg16(pretrained=True).double()
     # print(vgg16)
-
-
 
     # vgg16 = torchvision.models.vgg16(pretrained=True).double()
     # vgg16.eval()

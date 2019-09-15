@@ -36,10 +36,11 @@ def multichannel_conv2d(x, weight, bias):
 	feat = []
 	print("x.shape:", x.shape)
 	for o in range(output_dim):
-		feat.append(scipy.ndimage.convolve(x, weight[o], mode='constant'))
-		print("feat.shape:", feat.shape)
+		f = scipy.ndimage.convolve(x, weight[o], mode='constant')
+		print("f.shape:", f.shape)
+		feat.append(f)
 
-	feat = np.concatenate(feat, axis = 0)
+	feat = np.concatenate(feat, axis = 2)
 
 	print("feat shape after concatenate;", feat.shape)
 
