@@ -75,8 +75,11 @@ if __name__ == '__main__':
     y = network_layers.max_pool2d(x, 2)
     pool = torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
     y_torch = pool(torch.from_numpy(x.transpose((2, 0, 1))))
+    y_torch = y_torch.detach().numpy()
+    y_torch = y_torch.transpose((1, 2, 0))
     print("y.shape:", y.shape)
     print("y_torch.shape:", y_torch.shape)
+    print(np.linalg.norm(y-y_torch))
 
     # vgg16 = torchvision.models.vgg16(pretrained=True).double()
     # print(vgg16)
