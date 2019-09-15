@@ -63,8 +63,37 @@ def evaluate_recognition_system(num_workers=2):
     test_data = np.load("../data/test_data.npz")
     trained_system = np.load("trained_system.npz")
     # ----- TODO -----
+    NUM_CLASSES = 8
+    test_paths = test_data['files']
+    test_labels = test_data['labels']
+    train_features = trained_system['features']
+    train_labels = trained_system['labels']
+    dictionary = trained_system['dictionary']
+    K = dictionary.shape[0]
+    SPM_layer_num = trained_system['SPM_layer_num']
 
-    pass
+    # Construct the batches for multiprocessing pool
+    batches = []
+    for i, p in enumerate(test_paths):
+        image_path = os.path.join("../data/", p)
+        batches.append((image_path, dictionary, SPM_layer_num, K))
+
+    # Extract the image feature using multiprocessing
+    pool = multiprocessing.Pool(num_workers)
+    print("Multiprocessing start for get_image_feature()...", end=" ")
+    test_features = pool.starmap(get_image_feature, batches)
+    print("Done")
+
+    # Construct the confusion matrix
+    conf = np.zeros((NUM_CLASSES,NUM_CLASSES))
+    for x, y in zip(test_features, test_labels):
+        similarity = distance_to_set(x, train_features)
+        pred_y = train_labels[similarity.argmax()]
+        conf[y, pred_y] += 1
+    # Compute the accuracy
+    accuracy = np.diag(conf).sum()/conf.sum()
+
+    return conf, accuracy
 
 def get_image_feature(file_path, dictionary, layer_num, K):
     '''
@@ -146,7 +175,7 @@ def get_feature_from_wordmap_SPM(wordmap, layer_num, dict_size):
 
     # ----- TODO -----
     hist_all = []
-    L = layer_num - 1
+    L = int(layer_num - 1)
     K = dict_size
 
     # The sizes are from 1/1 to 1/(2^L)
@@ -179,7 +208,7 @@ def get_feature_from_wordmap_SPM(wordmap, layer_num, dict_size):
         if l == 0 or l == 1:
             normalize_factor = 2**(-L)
         else:
-            normalize_factor = (2**(l-L-1))
+            normalize_factor = 2**(l-L-1)
         hist_list = hist_grid.reshape((-1, dict_size)) * normalize_factor
         hist_all.append(hist_list)
 

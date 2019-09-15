@@ -48,11 +48,24 @@ if __name__ == '__main__':
     # hist = visual_recog.get_feature_from_wordmap_SPM(img, 3, dictionary.shape[0])
 
     '''q2.4 build a recognition system'''
-    visual_recog.build_recognition_system(num_workers=num_cores)
+    # visual_recog.build_recognition_system(num_workers=num_cores)
 
-    #conf, accuracy = visual_recog.evaluate_recognition_system(num_workers=num_cores)
-    #print(conf)
-    #print(np.diag(conf).sum()/conf.sum())
+    '''q2.5 evaluate the recognition system'''
+    conf, accuracy = visual_recog.evaluate_recognition_system(num_workers=num_cores)
+    print(conf)
+    print(accuracy)
+    '''
+    ============Output===========
+    [[14.  0.  0.  0.  0.  0.  0.  0.]
+     [ 0. 14.  0.  1.  0.  1.  2.  0.]
+     [ 0.  0. 15.  4.  3.  0.  0.  3.]
+     [ 1.  2.  1. 17.  0.  0.  1.  4.]
+     [ 1.  1.  0.  0. 10.  1.  0.  0.]
+     [ 0.  2.  0.  1.  8. 12.  1.  0.]
+     [ 0.  5.  0.  0.  2.  3. 11.  0.]
+     [ 0.  2.  3.  2.  1.  1.  0. 10.]]
+    0.64375
+    '''
 
     #vgg16 = torchvision.models.vgg16(pretrained=True).double()
     #vgg16.eval()
