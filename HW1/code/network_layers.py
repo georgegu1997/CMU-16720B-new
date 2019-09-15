@@ -29,8 +29,22 @@ def multichannel_conv2d(x, weight, bias):
 	[output]
 	* feat: numpy.ndarray of shape (H, W, output_dim)
 	'''
+	output_dim = weight.shape[0]
+	# transpose to (output_dim, kernel_size, kernel_size, input_dim)
+	weight = weight.transpose((0, 2, 3, 1))
 
-	pass
+	feat = []
+	print("x.shape:", x.shape)
+	for o in range(output_dim):
+		feat.append(scipy.ndimage.convolve(x, weight[o], mode='constant'))
+		print("feat.shape:", feat.shape)
+
+	feat = np.concatenate(feat, axis = 0)
+
+	print("feat shape after concatenate;", feat.shape)
+
+	return feat
+
 
 def relu(x):
 	'''
@@ -42,8 +56,9 @@ def relu(x):
 	[output]
 	* y: numpy.ndarray
 	'''
+	y = np.maximum(x, 0)
 
-	pass
+	return y
 
 def max_pool2d(x, size):
 	'''
@@ -56,7 +71,10 @@ def max_pool2d(x, size):
 	[output]
 	* y: numpy.ndarray of shape (H/size, W/size, input_dim)
 	'''
-
+	H, W, input_dim = x.shape
+	H_out = H//size
+	W_out = W//size
+	
 	pass
 
 def linear(x,W,b):
@@ -71,6 +89,5 @@ def linear(x,W,b):
 	[output]
 	* y: numpy.ndarray of shape (output_dim)
 	'''
-
-	pass
-
+	y = W.dot(x) + b
+	return y

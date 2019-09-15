@@ -51,11 +51,11 @@ if __name__ == '__main__':
     # visual_recog.build_recognition_system(num_workers=num_cores)
 
     '''q2.5 evaluate the recognition system'''
-    conf, accuracy = visual_recog.evaluate_recognition_system(num_workers=num_cores)
-    print(conf)
-    print(accuracy)
+    # conf, accuracy = visual_recog.evaluate_recognition_system(num_workers=num_cores)
+    # print(conf)
+    # print(accuracy)
     '''
-    ============Output===========
+    ============q2.5 Output===========
     [[14.  0.  0.  0.  0.  0.  0.  0.]
      [ 0. 14.  0.  1.  0.  1.  2.  0.]
      [ 0.  0. 15.  4.  3.  0.  0.  3.]
@@ -67,9 +67,11 @@ if __name__ == '__main__':
     0.64375
     '''
 
-    #vgg16 = torchvision.models.vgg16(pretrained=True).double()
-    #vgg16.eval()
-    #deep_recog.build_recognition_system(vgg16,num_workers=num_cores//2)
+    '''q3.1'''
+    vgg16 = torchvision.models.vgg16(pretrained=True).double()
+    vgg16.eval()
+    deep_recog.build_recognition_system(vgg16,num_workers=num_cores//2)
+
     #conf = deep_recog.evaluate_recognition_system(vgg16,num_workers=num_cores//2)
     #print(conf)
     #print(np.diag(conf).sum()/conf.sum())

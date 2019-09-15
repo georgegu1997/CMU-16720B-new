@@ -27,7 +27,7 @@ def build_recognition_system(vgg16, num_workers=2):
 	# ----- TODO -----
 	
 	pass
-	
+
 
 def evaluate_recognition_system(vgg16, num_workers=2):
 	'''
@@ -45,7 +45,7 @@ def evaluate_recognition_system(vgg16, num_workers=2):
 	test_data = np.load("../data/test_data.npz")
 
 	# ----- TODO -----
-	
+
 	pass
 
 
@@ -73,7 +73,7 @@ def get_image_feature(args):
 	* i: index of training image
 	* image_path: path of image file
 	* vgg16: prebuilt VGG-16 network.
-	
+
 	[output]
 	* feat: evaluated deep feature
 	'''
@@ -81,7 +81,7 @@ def get_image_feature(args):
 	i, image_path, vgg16 = args
 
 	# ----- TODO -----
-	
+
 	pass
 
 
