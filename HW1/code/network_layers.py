@@ -2,6 +2,8 @@ import numpy as np
 import scipy.ndimage
 import os
 
+from skimage.transform import resize
+
 def extract_deep_feature(x, vgg16_weights):
     '''
     Extracts deep features from the given VGG-16 weights.
@@ -13,8 +15,40 @@ def extract_deep_feature(x, vgg16_weights):
     [output]
     * feat: numpy.ndarray of shape (K)
     '''
+    # Assure the input is normal
+    # Convert the image to float type between 0 and 1
+    image = x
+    if image.dtype == np.uint8 or image.max() > 10:
+        image = image.astype(float) / 255.0
+    # Check and convert the dimensions
+    if image.ndim == 2:
+        image = np.stack([image]*3, axis=2)
 
-    pass
+    # Resize the image
+    image = resize(image, (224, 224))
+    # Normalize the image
+    mean = np.array([0.485,0.456,0.406]).reshape((1,1,3))
+    std = np.array([0.229,0.224,0.225]).reshape((1,1,3))
+    input = (image-mean)/std
+
+    x = input.copy()
+
+    # iterate over layers and do the inference
+    linear_count = 0
+    for layer in vgg16_weights:
+        if layer[0] == "conv2d":
+            x = multichannel_conv2d(x, layer[1], layer[2])
+        elif layer[0] == "relu":
+            x = relu(x)
+        elif layer[0] == "MaxPool2d":
+            x = max_pool2d(x, layer[1])
+        elif layer[0] == "linear":
+            linear_count += 1
+            x = linear(x, layer[1], layer[2])
+        if linear_count >= 2:
+            break
+
+    return x
 
 
 def multichannel_conv2d(x, weight, bias):
@@ -36,9 +70,10 @@ def multichannel_conv2d(x, weight, bias):
     weight = weight.transpose((0, 2, 3, 1))
 
     feat = []
-    print("x.shape:", x.shape)
     for o in range(output_dim):
         f = []
+        # Must have a inner loop for input_dim
+        # Otherwise the output will have a extra dimension of 3
         for i in range(input_dim):
             f.append( scipy.ndimage.correlate(x[:,:,i], weight[o,:,:,i], mode='constant') )
         f = np.stack(f, axis=2)
@@ -47,8 +82,6 @@ def multichannel_conv2d(x, weight, bias):
 
     feat = np.stack(feat, axis = 2)
     feat += bias.reshape((1,1,output_dim))
-
-    print("feat shape after concatenate;", feat.shape)
 
     return feat
 

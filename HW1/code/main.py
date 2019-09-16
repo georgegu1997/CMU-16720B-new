@@ -69,9 +69,9 @@ if __name__ == '__main__':
 
     '''q3.1 Test the network_layers'''
     import network_layers
-    import torch.nn
-    x = image
-    print("x.shape:", x.shape)
+    # import torch.nn
+    # x = image
+    # print("x.shape:", x.shape)
 
     '''test the multichannel_conv2d'''
     # weights = util.get_VGG16_weights()
@@ -94,10 +94,17 @@ if __name__ == '__main__':
     # y_torch = y_torch.transpose((1, 2, 0))
 
     '''The metrics for comparison'''
-    print("y.shape:", y.shape)
-    print("y_torch.shape:", y_torch.shape)
-    print(np.linalg.norm(y-y_torch))
-    print(np.absolute(y-y_torch).max())
+    # print("y.shape:", y.shape)
+    # print("y_torch.shape:", y_torch.shape)
+    # print(np.linalg.norm(y-y_torch))
+    # print(np.absolute(y-y_torch).max())
+
+    '''test network_layers.extract_deep_feature'''
+    x = image
+    weights = util.get_VGG16_weights()
+    y = network_layers.extract_deep_feature(x, weights)
+    print(y.shape)
+    
 
     # vgg16 = torchvision.models.vgg16(pretrained=True).double()
     # print(vgg16)
