@@ -3,6 +3,7 @@ import scipy.ndimage
 import os
 
 from skimage.transform import resize
+import multiprocessing
 
 def extract_deep_feature(x, vgg16_weights):
     '''
@@ -35,7 +36,11 @@ def extract_deep_feature(x, vgg16_weights):
 
     # iterate over layers and do the inference
     linear_count = 0
-    for layer in vgg16_weights:
+    for i, layer in enumerate(vgg16_weights):
+        print(i, layer[0])
+    print("-----------")
+    for i, layer in enumerate(vgg16_weights):
+        print(i, layer[0])
         if layer[0] == "conv2d":
             x = multichannel_conv2d(x, layer[1], layer[2])
         elif layer[0] == "relu":
