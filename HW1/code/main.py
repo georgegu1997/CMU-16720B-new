@@ -152,3 +152,16 @@ if __name__ == '__main__':
     conf, accuracy = deep_recog.evaluate_recognition_system(vgg16,num_workers=num_cores//2)
     print(conf)
     print(np.diag(conf).sum()/conf.sum())
+
+    '''
+    Output:
+    [[14.  0.  0.  0.  0.  0.  0.  0.]
+     [ 0. 17.  0.  0.  0.  0.  0.  1.]
+     [ 0.  0. 24.  0.  0.  0.  0.  1.]
+     [ 0.  0.  0. 26.  0.  0.  0.  0.]
+     [ 0.  0.  0.  0. 12.  1.  0.  0.]
+     [ 0.  0.  0.  0.  1. 23.  0.  0.]
+     [ 0.  0.  0.  0.  0.  0. 21.  0.]
+     [ 0.  0.  0.  0.  0.  0.  0. 19.]]
+    0.975
+    '''
