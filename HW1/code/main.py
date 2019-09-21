@@ -68,10 +68,10 @@ if __name__ == '__main__':
     '''
 
     '''q3.1 Test the network_layers'''
-    import network_layers
-    import torch.nn
-    x = image
-    print("x.shape:", x.shape)
+    # import network_layers
+    # import torch.nn
+    # x = image
+    # print("x.shape:", x.shape)
 
     '''test the multichannel_conv2d'''
     # weights = util.get_VGG16_weights()
@@ -141,13 +141,14 @@ if __name__ == '__main__':
     # feature_torch = feature_torch.reshape(-1)
     # print("Frobenius error in the computed features:", np.linalg.norm(feature_np - feature_torch))
 
-    # vgg16 = torchvision.models.vgg16(pretrained=True).double()
-    # print(vgg16)
+    '''Q3.2'''
+    vgg16 = torchvision.models.vgg16(pretrained=True).double()
+    vgg16.eval()
 
-    # vgg16 = torchvision.models.vgg16(pretrained=True).double()
-    # vgg16.eval()
-    # deep_recog.build_recognition_system(vgg16,num_workers=num_cores//2)
+    print("-----training------")
+    deep_recog.build_recognition_system(vgg16,num_workers=num_cores//2)
 
-    #conf = deep_recog.evaluate_recognition_system(vgg16,num_workers=num_cores//2)
-    #print(conf)
-    #print(np.diag(conf).sum()/conf.sum())
+    print("-----testing------")
+    conf, accuracy = deep_recog.evaluate_recognition_system(vgg16,num_workers=num_cores//2)
+    print(conf)
+    print(np.diag(conf).sum()/conf.sum())
