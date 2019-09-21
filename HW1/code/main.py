@@ -69,9 +69,9 @@ if __name__ == '__main__':
 
     '''q3.1 Test the network_layers'''
     import network_layers
-    # import torch.nn
-    # x = image
-    # print("x.shape:", x.shape)
+    import torch.nn
+    x = image
+    print("x.shape:", x.shape)
 
     '''test the multichannel_conv2d'''
     # weights = util.get_VGG16_weights()
@@ -93,6 +93,18 @@ if __name__ == '__main__':
     # y_torch = y_torch.detach().numpy()
     # y_torch = y_torch.transpose((1, 2, 0))
 
+    '''test the linear'''
+    # weights = util.get_VGG16_weights()
+    # vgg16 = torchvision.models.vgg16(pretrained=True).double()
+    # vgg16.eval()
+    # linear_torch = vgg16.classifier[0]
+    # W, b = weights[31][1], weights[31][2]
+    # x = np.random.rand(25088)
+    # y = network_layers.linear(x, W, b)
+    # x_torch = torch.from_numpy(np.expand_dims(x, axis=0))
+    # y_torch = linear_torch(x_torch)
+    # y_torch = y_torch.detach().numpy().squeeze()
+
     '''The metrics for comparison'''
     # print("y.shape:", y.shape)
     # print("y_torch.shape:", y_torch.shape)
@@ -100,11 +112,34 @@ if __name__ == '__main__':
     # print(np.absolute(y-y_torch).max())
 
     '''test network_layers.extract_deep_feature'''
-    x = image
-    weights = util.get_VGG16_weights()
-    y = network_layers.extract_deep_feature(x, weights)
-    print(y.shape)
-    
+    # weights = util.get_VGG16_weights()
+    # y = network_layers.extract_deep_feature(x, weights)
+    # print(y.shape)
+    # np.save("deep_feature", y)
+
+    '''Examing whether the feature extracted are the same'''
+    '''Frobenius error in the computed features: 5.2222423925424084e-14'''
+    # feature_np = np.load("deep_feature.npy")
+    # print("feature_np.shape:", feature_np.shape)
+    #
+    # x = network_layers.preprocess_image(image)
+    # # additional step on input for torch inference
+    # input_torch = np.expand_dims(x, axis = 0)
+    # input_torch = input_torch.transpose((0, 3, 1, 2))
+    # input_torch = torch.from_numpy(input_torch)
+    #
+    # # Load the vgg16 and conduct inference
+    # vgg16 = torchvision.models.vgg16(pretrained=True).double()
+    # vgg16.eval()
+    # net_classifier = torch.nn.Sequential(*list(list(vgg16.children())[2])[:4])
+    # net_classifier.eval()
+    # y = vgg16.features(input_torch)
+    # y = vgg16.avgpool(y)
+    # y = torch.flatten(y, 1)
+    # y = net_classifier(y)
+    # feature_torch = y.detach().numpy()
+    # feature_torch = feature_torch.reshape(-1)
+    # print("Frobenius error in the computed features:", np.linalg.norm(feature_np - feature_torch))
 
     # vgg16 = torchvision.models.vgg16(pretrained=True).double()
     # print(vgg16)

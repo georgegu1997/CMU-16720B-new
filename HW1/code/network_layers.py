@@ -4,6 +4,24 @@ import os
 
 from skimage.transform import resize
 import multiprocessing
+import time
+
+def preprocess_image(image):
+    # Convert the image to float type between 0 and 1
+    if image.dtype == np.uint8 or image.max() > 10:
+        image = image.astype(float) / 255.0
+    # Check and convert the dimensions
+    if image.ndim == 2:
+        image = np.stack([image]*3, axis=2)
+
+    # Resize the image
+    image = resize(image, (224, 224))
+    # Normalize the image
+    mean = np.array([0.485,0.456,0.406]).reshape((1,1,3))
+    std = np.array([0.229,0.224,0.225]).reshape((1,1,3))
+    image = (image-mean)/std
+
+    return image
 
 def extract_deep_feature(x, vgg16_weights):
     '''
@@ -17,44 +35,41 @@ def extract_deep_feature(x, vgg16_weights):
     * feat: numpy.ndarray of shape (K)
     '''
     # Assure the input is normal
-    # Convert the image to float type between 0 and 1
-    image = x
-    if image.dtype == np.uint8 or image.max() > 10:
-        image = image.astype(float) / 255.0
-    # Check and convert the dimensions
-    if image.ndim == 2:
-        image = np.stack([image]*3, axis=2)
-
-    # Resize the image
-    image = resize(image, (224, 224))
-    # Normalize the image
-    mean = np.array([0.485,0.456,0.406]).reshape((1,1,3))
-    std = np.array([0.229,0.224,0.225]).reshape((1,1,3))
-    input = (image-mean)/std
-
+    input = preprocess_image(x)
     x = input.copy()
 
     # iterate over layers and do the inference
     linear_count = 0
+    # for i, layer in enumerate(vgg16_weights):
+    #     print(i, layer[0])
+    # print("-----------")
     for i, layer in enumerate(vgg16_weights):
         print(i, layer[0])
-    print("-----------")
-    for i, layer in enumerate(vgg16_weights):
-        print(i, layer[0])
+        start_t = time.time()
         if layer[0] == "conv2d":
             x = multichannel_conv2d(x, layer[1], layer[2])
         elif layer[0] == "relu":
             x = relu(x)
-        elif layer[0] == "MaxPool2d":
+        elif layer[0] == "maxpool2d":
             x = max_pool2d(x, layer[1])
         elif layer[0] == "linear":
+            if linear_count == 0:
+                x = x.transpose((2, 0, 1)) # This is IMPORTANT
+                x = x.reshape(-1) # Flatten the feature vector
             linear_count += 1
             x = linear(x, layer[1], layer[2])
+        else:
+            print("ERROR: unknown layer:", layer[0])
+        end_t = time.time()
+        print("Time used: %.3fs" % (start_t - end_t))
         if linear_count >= 2:
             break
 
     return x
 
+
+def conv(x, w):
+    return scipy.ndimage.correlate(x, w, mode='constant')
 
 def multichannel_conv2d(x, weight, bias):
     '''
@@ -78,7 +93,7 @@ def multichannel_conv2d(x, weight, bias):
     for o in range(output_dim):
         f = []
         # Must have a inner loop for input_dim
-        # Otherwise the output will have a extra dimension of 3
+        # Otherwise the output will have a extra dimension
         for i in range(input_dim):
             f.append( scipy.ndimage.correlate(x[:,:,i], weight[o,:,:,i], mode='constant') )
         f = np.stack(f, axis=2)
@@ -146,5 +161,8 @@ def linear(x,W,b):
     [output]
     * y: numpy.ndarray of shape (output_dim)
     '''
-    y = W.dot(x) + b
+    x = x.reshape((-1, 1))
+    b = b.reshape((-1, 1))
+    y = np.matmul(W, x) + b
+    y = y.reshape((-1))
     return y
