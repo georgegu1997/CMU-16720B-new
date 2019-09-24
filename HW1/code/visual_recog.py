@@ -86,12 +86,21 @@ def evaluate_recognition_system(num_workers=2):
 
     # Construct the confusion matrix
     conf = np.zeros((NUM_CLASSES,NUM_CLASSES))
-    for x, y in zip(test_features, test_labels):
+    # Record the hard examples
+    failures = []
+    for i, (x, y) in enumerate(zip(test_features, test_labels)):
         similarity = distance_to_set(x, train_features)
         pred_y = train_labels[similarity.argmax()]
         conf[y, pred_y] += 1
+        # Record the images that are misclassified
+        if y != pred_y:
+            failures.append((test_paths[i], y, pred_y))
     # Compute the accuracy
     accuracy = np.diag(conf).sum()/conf.sum()
+
+    # print the hard examples
+    print("Failure cases: (path, label, predicted_label)")
+    print("\n".join([str(f) for f in failures]))
 
     return conf, accuracy
 
