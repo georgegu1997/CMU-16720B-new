@@ -2,9 +2,8 @@ import numpy as np
 import scipy.ndimage
 import os
 
+'''This additional import is suggested by the handout'''
 from skimage.transform import resize
-import multiprocessing
-import time
 
 def preprocess_image(image):
     # Convert the image to float type between 0 and 1
@@ -45,7 +44,6 @@ def extract_deep_feature(x, vgg16_weights):
     # print("-----------")
     for i, layer in enumerate(vgg16_weights):
         print(i, layer[0])
-        start_t = time.time()
         if layer[0] == "conv2d":
             x = multichannel_conv2d(x, layer[1], layer[2])
         elif layer[0] == "relu":
@@ -60,8 +58,6 @@ def extract_deep_feature(x, vgg16_weights):
             x = linear(x, layer[1], layer[2])
         else:
             print("ERROR: unknown layer:", layer[0])
-        end_t = time.time()
-        print("Time used: %.3fs" % (start_t - end_t))
         if linear_count >= 2:
             break
 
