@@ -72,6 +72,10 @@ def evaluate_recognition_system(num_workers=2):
     K = dictionary.shape[0]
     SPM_layer_num = trained_system['SPM_layer_num']
 
+    # For Q2.6
+    train_data = np.load("../data/train_data.npz")
+    train_paths = train_data['files']
+
     # Construct the batches for multiprocessing pool
     batches = []
     for i, p in enumerate(test_paths):
@@ -90,17 +94,19 @@ def evaluate_recognition_system(num_workers=2):
     failures = []
     for i, (x, y) in enumerate(zip(test_features, test_labels)):
         similarity = distance_to_set(x, train_features)
+        # The index of its nearest neighbor in the training set
+        nn_index = similarity.argmax()
         pred_y = train_labels[similarity.argmax()]
         conf[y, pred_y] += 1
         # Record the images that are misclassified
         if y != pred_y:
-            failures.append((test_paths[i], y, pred_y))
+            failures.append((test_paths[i], y, pred_y, train_paths[nn_index]))
     # Compute the accuracy
     accuracy = np.diag(conf).sum()/conf.sum()
 
-    # print the hard examples
-    print("Failure cases: (path, label, predicted_label)")
-    print("\n".join([str(f) for f in failures]))
+    ''' For q2.6, print the failure cases and their nearest neighbors '''
+    # print("Failure cases: (path, label, predicted_label)")
+    # print("\n".join([str(f) for f in failures]))
 
     return conf, accuracy
 

@@ -19,26 +19,26 @@ if __name__ == '__main__':
     num_cores = util.get_num_CPU()
 
     '''Load an example image'''
-    path_img = "../data/kitchen/sun_aasmevtpkslccptd.jpg"
+    path_img = "../data/aquarium/sun_aztvjgubyrgvirup.jpg"
     image = skimage.io.imread(path_img)
     image = image.astype('float')/255
 
     '''q1.1.2 get filter responses and display them'''
-    # filter_responses = visual_words.extract_filter_responses(image)
-    # util.display_filter_responses(filter_responses)
+    filter_responses = visual_words.extract_filter_responses(image)
+    util.display_filter_responses(filter_responses)
 
     '''q1.2 Compute the dictionary'''
-    # visual_words.compute_dictionary(num_workers=num_cores)
+    visual_words.compute_dictionary(num_workers=num_cores)
 
     '''q1.3 Get visual codes using the dictionary'''
-    # path_imgs = [
-    #     "../data/park/labelme_brrdxeoavpkqjzs.jpg",
-    #     "../data/park/labelme_caqoztrngzoasnb.jpg",
-    #     "../data/park/labelme_zbyarunxxqdfebc.jpg"
-    #     ]
-    # for path_img in path_imgs:
-    #     n = path_img.split("/")[-1].split(".")[0]
-    #     getVisualWordAndSave(path_img, "../results/%s" % n)
+    path_imgs = [
+        "../data/park/labelme_brrdxeoavpkqjzs.jpg",
+        "../data/park/labelme_caqoztrngzoasnb.jpg",
+        "../data/park/labelme_zbyarunxxqdfebc.jpg"
+        ]
+    for path_img in path_imgs:
+        n = path_img.split("/")[-1].split(".")[0]
+        getVisualWordAndSave(path_img, "../results/%s" % n)
 
     '''q2.1 test get_feature_from_wordmap'''
     # dictionary = np.load('dictionary.npy')
@@ -54,12 +54,12 @@ if __name__ == '__main__':
     # hist = visual_recog.get_feature_from_wordmap_SPM(img, 3, dictionary.shape[0])
 
     '''q2.4 build a recognition system'''
-    # visual_recog.build_recognition_system(num_workers=num_cores)
+    visual_recog.build_recognition_system(num_workers=num_cores)
 
     '''q2.5 evaluate the recognition system'''
-    # conf, accuracy = visual_recog.evaluate_recognition_system(num_workers=num_cores)
-    # print(conf)
-    # print(accuracy)
+    conf, accuracy = visual_recog.evaluate_recognition_system(num_workers=num_cores)
+    print(conf)
+    print(accuracy)
     '''
     ============q2.5 Output===========
     [[14.  0.  0.  0.  0.  0.  0.  0.]
@@ -73,16 +73,17 @@ if __name__ == '__main__':
     0.64375
     '''
 
-    ''' Analyze the failure cases'''
-    path_imgs = [
-        ('../data/desert/sun_bqxjwczwiwnzkrbj.jpg', 2, 3),
-        ('../data/desert/sun_bqujpdxcuslyzejj.jpg', 2, 3),
-        ('../data/desert/sun_bytguqqbadccqkyt.jpg', 2, 3),
-        ('../data/desert/sun_bgwdwaeuakbmuxeg.jpg', 2, 3),
-        ]
-    for path_img in path_imgs:
-        n = path_img[0].split("/")[-1].split(".")[0]
-        getVisualWordAndSave(path_img[0], "../results/%s" % n)
+    '''q2.6 Analyze the failure cases'''
+    # path_imgs = [
+    #     ('../data/desert/sun_bqxjwczwiwnzkrbj.jpg', 2, 3),
+    #     ("../data/highway/sun_bgbooicntiiexavj.jpg", )
+    #     # ('../data/desert/sun_bqujpdxcuslyzejj.jpg', 2, 3),
+    #     # ('../data/desert/sun_bytguqqbadccqkyt.jpg', 2, 3),
+    #     # ('../data/desert/sun_bgwdwaeuakbmuxeg.jpg', 2, 3),
+    #     ]
+    # for path_img in path_imgs:
+    #     n = path_img[0].split("/")[-1].split(".")[0]
+    #     getVisualWordAndSave(path_img[0], "../results/%s" % n)
 
     '''q3.1 Test the network_layers'''
     # import network_layers
@@ -122,7 +123,7 @@ if __name__ == '__main__':
     # y_torch = linear_torch(x_torch)
     # y_torch = y_torch.detach().numpy().squeeze()
 
-    '''The metrics for comparison'''
+    '''The metrics for the above tests'''
     # print("y.shape:", y.shape)
     # print("y_torch.shape:", y_torch.shape)
     # print(np.linalg.norm(y-y_torch))
@@ -159,16 +160,16 @@ if __name__ == '__main__':
     # print("Frobenius error in the computed features:", np.linalg.norm(feature_np - feature_torch))
 
     '''Q3.2'''
-    # vgg16 = torchvision.models.vgg16(pretrained=True).double()
-    # vgg16.eval()
-    #
-    # print("-----training------")
-    # deep_recog.build_recognition_system(vgg16,num_workers=num_cores//2)
-    #
-    # print("-----testing------")
-    # conf, accuracy = deep_recog.evaluate_recognition_system(vgg16,num_workers=num_cores//2)
-    # print(conf)
-    # print(np.diag(conf).sum()/conf.sum())
+    vgg16 = torchvision.models.vgg16(pretrained=True).double()
+    vgg16.eval()
+
+    print("-----training------")
+    deep_recog.build_recognition_system(vgg16,num_workers=num_cores//2)
+
+    print("-----testing------")
+    conf, accuracy = deep_recog.evaluate_recognition_system(vgg16,num_workers=num_cores//2)
+    print(conf)
+    print(np.diag(conf).sum()/conf.sum())
 
     '''
     Output:
