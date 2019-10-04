@@ -16,14 +16,21 @@ def makeTestPattern(patch_width=9, nbits=256):
         nbits       - the number of tests n in the BRIEF descriptor
 
     OUTPUTS
-        compareX and compareY - LINEAR indices into the patch_width x patch_width image 
-                                patch and are each (nbits,) vectors. 
+        compareX and compareY - LINEAR indices into the patch_width x patch_width image
+                                patch and are each (nbits,) vectors.
     '''
-    
+
     #############################
     # TO DO ...
     # Generate testpattern here
-    
+    # Implement the second method from the paper: the isotropic Guassian distribution
+    sigma = patch_width / 5.0
+    mu = (patch_width-1)/2
+    compareX = np.random.normal(mu, sigma, (nbits, 2)).round().clip(0, patch_width-1)
+    compareY = np.random.normal(mu, sigma, (nbits, 2)).round().clip(0, patch_width-1)
+    # Convert them to linear coordinates
+    compareX = (compareX[:,0] * patch_width + compareX[:,1]).astype(int)
+    compareY = (compareY[:,0] * patch_width + compareY[:,1]).astype(int)
     return  compareX, compareY
 
 
@@ -48,11 +55,11 @@ def computeBrief(im, gaussian_pyramid, locsDoG, k, levels,
         locsDoG - locsDoG are the keypoint locations returned by the DoG
                 detector.
         levels  - Gaussian scale levels that were given in Section1.
-        compareX and compareY - linear indices into the 
+        compareX and compareY - linear indices into the
                                 (patch_width x patch_width) image patch and are
                                 each (nbits,) vectors.
-    
-    
+
+
     OUTPUT
         locs - an m x 3 vector, where the first two columns are the image
                 coordinates of keypoints and the third column is the pyramid
@@ -60,11 +67,35 @@ def computeBrief(im, gaussian_pyramid, locsDoG, k, levels,
         desc - an m x n bits matrix of stacked BRIEF descriptors. m is the number
                 of valid descriptors in the image and will vary.
     '''
-    
+
     ##############################
     # TO DO ...
     # compute locs, desc here
-    
+    patch_width = 9
+
+    # Smooth the image
+    im = cv2.GaussianBlur(im, (0,0), np.sqrt(2))
+
+    # Exclude the locations where we cannot get full patches
+    h, w = im.shape
+    locs = locsDoG.copy()
+    # x coordinate corresponds to columns and y coordinate corresponds to rows
+    id_x = np.logical_and(locs[:, 0] > (patch_width-1)/2, locs[:, 0] < w - (patch_width-1)/2)
+    id_y = np.logical_and(locs[:, 1] > (patch_width-1)/2, locs[:, 1] < h - (patch_width-1)/2)
+    locs = locs[np.logical_and(id_x, id_y)]
+
+    # Compute brief for each patch
+    desc = []
+    for loc in locs:
+        x, y, _ = loc
+        # x coordinate corresponds to columns and y coordinate corresponds to rows
+        p = im[int(y-(patch_width-1)/2):int(y+(patch_width+1)/2), \
+                int(x-(patch_width-1)/2):int(x+(patch_width+1)/2)]
+        p = p.reshape(-1)
+        bits = p[compareX] < p[compareY]
+        desc.append(bits)
+    desc = np.array(desc)
+
     return locs, desc
 
 
@@ -74,16 +105,23 @@ def briefLite(im):
         im - gray image with values between 0 and 1
 
     OUTPUTS
-        locs - an m x 3 vector, where the first two columns are the image coordinates 
+        locs - an m x 3 vector, where the first two columns are the image coordinates
             of keypoints and the third column is the pyramid level of the keypoints
-        desc - an m x n bits matrix of stacked BRIEF descriptors. 
+        desc - an m x n bits matrix of stacked BRIEF descriptors.
             m is the number of valid descriptors in the image and will vary
             n is the number of bits for the BRIEF descriptor
     '''
-    
+
     ###################
     # TO DO ...
-    
+
+    if len(im.shape)==3:
+        im = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+    if im.max()>10:
+        im = np.float32(im)/255
+
+    locsDoG, gaussian_pyramid = DoGdetector(im)
+    locs,desc = computeBrief(im, gaussian_pyramid, locsDoG, np.sqrt(2), [-1,0,1,2,3,4], compareX, compareY)
     return locs, desc
 
 
@@ -97,7 +135,7 @@ def briefMatch(desc1, desc2, ratio=0.8):
         matches - p x 2 matrix. where the first column are indices
                                         into desc1 and the second column are indices into desc2
     '''
-    
+
     D = cdist(np.float32(desc1), np.float32(desc2), metric='hamming')
     # find smallest distance
     ix2 = np.argmin(D, axis=1)
@@ -128,25 +166,36 @@ def plotMatches(im1, im2, matches, locs1, locs2):
         pt2[0] += im1.shape[1]
         x = np.asarray([pt1[0], pt2[0]])
         y = np.asarray([pt1[1], pt2[1]])
-        plt.plot(x,y,'r')
-        plt.plot(x,y,'g.')
-    plt.show()    
-    
+        plt.plot(x,y,'r', linewidth=0.3)
+        plt.plot(x,y,'g.', ms=2)
+    # plt.show()
 
-if __name__ == '__main__':
+def matchImages(file1, file2, save_file = None):
+    im1 = cv2.imread(file1)
+    im2 = cv2.imread(file2)
+    locs1, desc1 = briefLite(im1)
+    locs2, desc2 = briefLite(im2)
+    matches = briefMatch(desc1, desc2)
+    if not save_file is None:
+        plotMatches(im1,im2,matches,locs1,locs2)
+        plt.savefig(save_file, dpi=300)
+    else:
+        plotMatches(im1,im2,matches,locs1,locs2)
+
+def main():
     # test makeTestPattern
     compareX, compareY = makeTestPattern()
-    
+
     # test briefLite
     im = cv2.imread('../data/model_chickenbroth.jpg')
-    locs, desc = briefLite(im)  
+    locs, desc = briefLite(im)
     fig = plt.figure()
     plt.imshow(cv2.cvtColor(im, cv2.COLOR_BGR2GRAY), cmap='gray')
     plt.plot(locs[:,0], locs[:,1], 'r.')
     plt.draw()
     plt.waitforbuttonpress(0)
     plt.close(fig)
-    
+
     # test matches
     im1 = cv2.imread('../data/model_chickenbroth.jpg')
     im2 = cv2.imread('../data/chickenbroth_01.jpg')
@@ -154,3 +203,15 @@ if __name__ == '__main__':
     locs2, desc2 = briefLite(im2)
     matches = briefMatch(desc1, desc2)
     plotMatches(im1,im2,matches,locs1,locs2)
+
+    matchImages('../data/model_chickenbroth.jpg', '../data/chickenbroth_01.jpg', "../results/chickenbroth_01_match.jpg")
+    matchImages('../data/incline_L.png', '../data/incline_R.png', "../results/incline_match.jpg")
+    matchImages('../data/pf_scan_scaled.jpg', '../data/pf_stand.jpg', "../results/pf_stand_match.jpg")
+    matchImages('../data/pf_scan_scaled.jpg', '../data/pf_floor.jpg', "../results/pf_floor_match.jpg")
+    matchImages('../data/pf_scan_scaled.jpg', '../data/pf_floor_rot.jpg', "../results/pf_floor_rot_match.jpg")
+    matchImages('../data/pf_scan_scaled.jpg', '../data/pf_desk.jpg', "../results/pf_desk_match.jpg")
+    matchImages('../data/pf_scan_scaled.jpg', '../data/pf_pile.jpg', "../results/pf_pile_match.jpg")
+
+
+if __name__ == '__main__':
+    main()
