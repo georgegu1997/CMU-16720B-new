@@ -96,6 +96,20 @@ Please see Figure~\ref{fig:q2.4} for the matching results. From the results, we 
 
 \subsection*{Q2.5}
 
+Please see Figure~\ref{fig:q2.5} for the matching results. As we can see, the number of matches reaches its maximum when there is no rotation between two images, and drops quickly when the rotation angle starts to increase. This is probably because the BRIEF descriptor we Implement only treats each keypoint patch as a rectangle grid, and thus when the rectangle is rotated, the whole grid structure can be messed up. Therefore the number of matches drops quickly as with rotation.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.8\linewidth]{../results/q2_5.png}
+    \caption{The rotation angle vs the number of correct matches}
+    \label{fig:q2.5}
+\end{figure}
+
+\newpage
+
+\subsection*{Q3.1}
+
+
 
 
 \end{document}
