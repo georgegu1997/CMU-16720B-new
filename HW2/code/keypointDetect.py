@@ -77,7 +77,7 @@ def computePrincipalCurvature(DoG_pyramid):
 
     # Compute the Principal Curvature using Hessian
     Tr = Dxx + Dyy
-    Det = Dxx * Dyy + Dxy ** 2
+    Det = Dxx * Dyy - Dxy ** 2 + 1e-7
     principal_curvature = Tr**2 / Det
 
     # Take the absolute value and convert back to uint8
