@@ -195,6 +195,10 @@ We only need 4 correspondence to solve this system, since each point corresponde
 \subsubsection*{Q3.1.4}
 
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\bh}{\mathbf{h}}
+\newcommand{\bA}{\mathbf{A}}
+\newcommand{\bB}{\mathbf{B}}
 
 The problem can be formulated as
 
@@ -214,7 +218,23 @@ When we have more than 4 correspondence, a accurate solution cannot be found and
     \quad \textrm{s.t.} \; \mathbf{h}^T \mathbf{h} = 1
 \end{align}
 
-The expression on the L.H.S. in the above equation is the Rayleigh quotient of the matrix $A^T A$, and its minimum is the minimum eigenvalue $\lambda_{min}$ of $A^T A$. Therefore, if we can find the singular value decomposition $\mathbf{A} = \mathbf{U\Sigma V}^T$, the solution $\mathbf{h}$ will be the right singular vector $v_9$ corresponding to the minimum singular value $\sigma_{min}=\sigma_9$ of $\mathbf{A}$. (Note that $\mathbf{A}\in \mathbb{R}^{2N\times 9}$ and $\mathbf{A}^T\mathbf{A}\in \mathbb{R}^{9\times 9}$)
+Since $\bB = \bA^T\bA$ is a symmetric positive semidefinite matrix ($\bh^T\bA^T\bA\bh=||\bA\bh||_2^2\geq 0$), it has $n$ mutually orthonormal eigenvectors $\bx_1, \dots, \bx_n$ with associating eigenvalues $\lambda_1,\dots,\lambda_n$ and  $\lambda_1 \geq \lambda_2 \geq \dots \geq \lambda_n \geq 0$. Assume $\bh=\sum_{i=1}^n k_i\bx_i$, then $\bh^T\bh=\sum_{i=1}^n k_i\bx_i^T \sum_{i=1}^n k_i\bx_i= \sum_{i=1}^n k_i^2 = 1$ and
+
+\begin{align}
+\begin{split}
+  \frac{\bh^T\bA^T\bA\bh}{\bh^T\bh} &=
+  \frac{\sum_{i=1}^n k_i\bx_i^T \bB \sum_{i=1}^n k_i\bx_i}{\sum_{i=1}^n k_i\bx_i^T \sum_{i=1}^n k_i\bx_i} \\
+  &= \frac{\sum_{i=1}^n k_i\bx_i^T \sum_{i=1}^n \bB k_i\bx_i}{\sum_{i=1}^n k_i\bx_i^T k_i\bx_i} \\
+  &= \frac{\sum_{i=1}^n k_i\bx_i^T \sum_{i=1}^n \lambda_i k_i\bx_i}{\sum_{i=1}^n k_i^2 } \\
+  &= \frac{\sum_{i=1}^n k_i\bx_i^T \lambda_i k_i\bx_i}{1 } \\
+  &= \sum_{i=1}^n \lambda_i k_i^2 \bx_i^T \bx_i \\
+  &= \sum_{i=1}^n \lambda_i k_i^2 \\
+  &\geq \sum_{i=1}^n \lambda_n k_i^2 = \lambda_n
+\end{split}
+\end{align}
+
+The above deduection shows that the Rayleigh quotient $\frac{\bh^T\bA^T\bA\bh}{\bh^T\bh}$ has its minimum $\lambda_{min}$ of $\bA^T \bA$, when $\bh=\bx_n$. Therefore, if we can find the singular value decomposition $\mathbf{A} = \mathbf{U\Sigma V}^T$, the solution $\mathbf{h}$ will be the right singular vector $v_9$ corresponding to the minimum singular value $\sigma_{min}=\sigma_9$ of $\mathbf{A}$.
+(Note that $\mathbf{A}\in \mathbb{R}^{2N\times 9}$ and $\mathbf{A}^T\mathbf{A}\in \mathbb{R}^{9\times 9}$)
 
 \newpage
 
