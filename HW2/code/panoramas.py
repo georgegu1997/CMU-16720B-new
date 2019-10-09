@@ -49,7 +49,7 @@ def imageStitching(im1, im2, H2to1):
 
     # warp the im2 and the mask of im2
     warp_im = cv2.warpPerspective(im2, H2to1, output_shape)
-    cv2.imwrite('../results/6_1_warp.jpg', warp_im)
+    cv2.imwrite('../results/q6_1_warp.jpg', warp_im)
     warp_mask = cv2.warpPerspective(im2_mask, H2to1, output_shape)
 
     # Construct the panorama image and its mask
@@ -131,7 +131,7 @@ def imageStitching_noClip(im1, im2, H2to1):
     return pano_im
 
 
-def generatePanaroma(im1, im2):
+def generatePanorama(im1, im2):
     '''
     Generate and save panorama of im1 and im2.
 
@@ -162,7 +162,7 @@ def main():
 
     # 6.1
     pano_im = imageStitching(im1, im2, H2to1)
-    cv2.imwrite('../results/6_1_pan.jpg', pano_im)
+    cv2.imwrite('../results/q6_1_pan.jpg', pano_im)
     np.save('../results/q6_1.npy', H2to1)
     cv2.imshow('panoramas', pano_im)
     cv2.waitKey(0)
@@ -170,7 +170,7 @@ def main():
 
     # 6.2 No cliping
     pano_im = imageStitching_noClip(im1, im2, H2to1)
-    cv2.imwrite('../results/6_2_pan.jpg', pano_im)
+    cv2.imwrite('../results/q6_2_pan.jpg', pano_im)
     cv2.imshow('panoramas', pano_im)
     cv2.waitKey(0)
     cv2.destroyAllWindows()

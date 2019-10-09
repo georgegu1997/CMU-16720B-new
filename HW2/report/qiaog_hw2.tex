@@ -52,7 +52,7 @@ Please see Figure.~\ref{fig:q1.5} for the detected keypoints of \code{model\_chi
 
 Please see Figure~\ref{fig:q2.4} for the matching results. From the results, we can see that if the object is rotated, the matching performance will be much worse than those with little or no rotation (compare Figure.~\ref{fig:q2.4} (d)(g) with Figure.~\ref{fig:q2.4} (c)(f)). I suspect this is because the BRIEF descriptor does not encode the patch into a rotation-invariant space and thus have poor ability to match rotated patches.
 
-\begin{figure}[h!] \label{fig:q2.4}
+\begin{figure}[h!]
     \begin{subfigure}{.49\textwidth}
       \centering
       \includegraphics[width=.8\linewidth]{../results/chickenbroth_01_match.jpg}
@@ -219,6 +219,62 @@ The expression on the L.H.S. in the above equation is the Rayleigh quotient of t
 \newpage
 
 \subsection*{Q6.1}
+
+Please see Figure.~\ref{fig:q6.1} for the results. Here we simply extend the width of the image to contain more part of the warped image, which will be enhanced in the next section.
+
+\begin{figure}[h!]
+    \begin{subfigure}{\textwidth}
+      \centering
+      \includegraphics[width=.8\linewidth]{../results/q6_1_warp.jpg}
+      \caption{The warped image. }
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+      \centering
+      \includegraphics[width=.8\linewidth]{../results/q6_1_pan.jpg}
+      \caption{The generated panorama. }
+    \end{subfigure}
+    \caption{Results for \textbf{Q6.1}. }
+    \label{fig:q6.1}
+\end{figure}
+
+\newpage
+
+\subsection*{Q6.2}
+
+Please see Figure.~\ref{fig:q6.2} for the result.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.8\linewidth]{../results/q6_2_pan.jpg}
+    \caption{The panorama with no clipping on image borders. }
+    \label{fig:q6.2}
+\end{figure}
+
+\newpage
+
+\subsection*{Q6.3}
+
+Please see Figure.~\ref{fig:q6.3} for the result.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.8\linewidth]{../results/q6_3.jpg}
+    \caption{The generated panorama. }
+    \label{fig:q6.3}
+\end{figure}
+
+\newpage
+
+\subsection*{Q7.1}
+
+Please see Figure.~\ref{fig:q6.3} for the result of putting the ball at the center of ``O''.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\linewidth]{../results/q7_2.png}
+    \caption{The augmented reality result. The image has been enlarged to see details.  }
+    \label{fig:q6.3}
+\end{figure}
 
 
 
