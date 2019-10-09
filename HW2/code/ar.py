@@ -108,4 +108,5 @@ if __name__ == "__main__":
 
     plt.imshow(im[:,:,::-1])
     plt.plot(projected_points[0,:], projected_points[1,:], 'yo')
-    plt.show()
+    '''for submission'''
+    # plt.show()

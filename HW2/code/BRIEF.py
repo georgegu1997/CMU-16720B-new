@@ -189,12 +189,13 @@ def main():
     # test briefLite
     im = cv2.imread('../data/model_chickenbroth.jpg')
     locs, desc = briefLite(im)
-    fig = plt.figure()
-    plt.imshow(cv2.cvtColor(im, cv2.COLOR_BGR2GRAY), cmap='gray')
-    plt.plot(locs[:,0], locs[:,1], 'r.')
-    plt.draw()
-    plt.waitforbuttonpress(0)
-    plt.close(fig)
+    '''for submission'''
+    # fig = plt.figure()
+    # plt.imshow(cv2.cvtColor(im, cv2.COLOR_BGR2GRAY), cmap='gray')
+    # plt.plot(locs[:,0], locs[:,1], 'r.')
+    # plt.draw()
+    # plt.waitforbuttonpress(0)
+    # plt.close(fig)
 
     # test matches
     im1 = cv2.imread('../data/model_chickenbroth.jpg')
@@ -204,12 +205,19 @@ def main():
     matches = briefMatch(desc1, desc2)
     plotMatches(im1,im2,matches,locs1,locs2)
 
+    print('../data/model_chickenbroth.jpg', '../data/chickenbroth_01.jpg', "../results/chickenbroth_01_match.jpg")
     matchImages('../data/model_chickenbroth.jpg', '../data/chickenbroth_01.jpg', "../results/chickenbroth_01_match.jpg")
+    print('../data/incline_L.png', '../data/incline_R.png', "../results/incline_match.jpg")
     matchImages('../data/incline_L.png', '../data/incline_R.png', "../results/incline_match.jpg")
+    print('../data/pf_scan_scaled.jpg', '../data/pf_stand.jpg', "../results/pf_stand_match.jpg")
     matchImages('../data/pf_scan_scaled.jpg', '../data/pf_stand.jpg', "../results/pf_stand_match.jpg")
+    print('../data/pf_scan_scaled.jpg', '../data/pf_floor.jpg', "../results/pf_floor_match.jpg")
     matchImages('../data/pf_scan_scaled.jpg', '../data/pf_floor.jpg', "../results/pf_floor_match.jpg")
+    print('../data/pf_scan_scaled.jpg', '../data/pf_floor_rot.jpg', "../results/pf_floor_rot_match.jpg")
     matchImages('../data/pf_scan_scaled.jpg', '../data/pf_floor_rot.jpg', "../results/pf_floor_rot_match.jpg")
+    print('../data/pf_scan_scaled.jpg', '../data/pf_desk.jpg', "../results/pf_desk_match.jpg")
     matchImages('../data/pf_scan_scaled.jpg', '../data/pf_desk.jpg', "../results/pf_desk_match.jpg")
+    print('../data/pf_scan_scaled.jpg', '../data/pf_pile.jpg', "../results/pf_pile_match.jpg")
     matchImages('../data/pf_scan_scaled.jpg', '../data/pf_pile.jpg', "../results/pf_pile_match.jpg")
 
 

@@ -211,12 +211,13 @@ def main():
     levels = [-1,0,1,2,3,4]
     im = cv2.imread('../data/model_chickenbroth.jpg')
     im_pyr = createGaussianPyramid(im)
-    displayPyramid(im_pyr)
+    '''for submission'''
+    # displayPyramid(im_pyr)
 
     # test DoG pyramid
-    print(im_pyr.shape)
     DoG_pyr, DoG_levels = createDoGPyramid(im_pyr, levels)
-    displayPyramid(DoG_pyr)
+    '''for submission'''
+    # displayPyramid(DoG_pyr)
 
     # test compute principal curvature
     pc_curvature = computePrincipalCurvature(DoG_pyr)
@@ -230,7 +231,8 @@ def main():
     locsDoG, gaussian_pyramid = DoGdetector(im)
 
     # Draw the result keypoints as circles on the image
-    drawn = drawPoints(im, locsDoG, resize_factor=3)
+    '''for submission'''
+    # drawn = drawPoints(im, locsDoG, resize_factor=3)
 
 if __name__ == '__main__':
     main()

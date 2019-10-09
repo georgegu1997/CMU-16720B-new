@@ -41,7 +41,8 @@ def main():
     ax.bar(results[:,0] - 2, results[:,1], width=2, color='b', align='center', label="matches")
     ax.set_xlabel("Rotation (degree)")
     ax.set_ylabel("Number of matches")
-    plt.show()
+    '''for submission'''
+    # plt.show()
 
 if __name__ == "__main__":
     main()

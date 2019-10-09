@@ -164,23 +164,26 @@ def main():
     pano_im = imageStitching(im1, im2, H2to1)
     cv2.imwrite('../results/q6_1_pan.jpg', pano_im)
     np.save('../results/q6_1.npy', H2to1)
-    cv2.imshow('panoramas', pano_im)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    '''for submission'''
+    # cv2.imshow('panoramas', pano_im)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     # 6.2 No cliping
     pano_im = imageStitching_noClip(im1, im2, H2to1)
     cv2.imwrite('../results/q6_2_pan.jpg', pano_im)
-    cv2.imshow('panoramas', pano_im)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    '''for submission'''
+    # cv2.imshow('panoramas', pano_im)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     # 6.3 all together
     pano_im = generatePanorama(im1, im2)
     cv2.imwrite('../results/q6_3.jpg', pano_im)
-    cv2.imshow('panoramas', pano_im)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    '''for submission'''
+    # cv2.imshow('panoramas', pano_im)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     main()
