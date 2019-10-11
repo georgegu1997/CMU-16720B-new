@@ -3,7 +3,7 @@ import cv2
 import os
 from planarH import computeH
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 def compute_extrinsics(K, H):
     '''
@@ -106,7 +106,7 @@ if __name__ == "__main__":
     points_shifted = points + shift
     projected_points = project_extrinsics(K, points_shifted, R, t)
 
-    plt.imshow(im[:,:,::-1])
-    plt.plot(projected_points[0,:], projected_points[1,:], 'yo')
+    # plt.imshow(im[:,:,::-1])
+    # plt.plot(projected_points[0,:], projected_points[1,:], 'yo')
     '''for submission'''
     # plt.show()
