@@ -86,27 +86,27 @@
 Please find the results of Lucas-Kanade tracking results in Figure.~\ref{fig:q1.3}
 
 \begin{figure}[h!]
-    \begin{subfigure}{.19\textwidth}
+    \begin{subfigure}{.195\textwidth}
       \centering
       \includegraphics[width=.95\linewidth]{../results/carseqrects_0.png}
       \caption{frame 1}
     \end{subfigure}
-    \begin{subfigure}{.19\textwidth}
+    \begin{subfigure}{.195\textwidth}
       \centering
       \includegraphics[width=.95\linewidth]{../results/carseqrects_99.png}
       \caption{frame 100}
     \end{subfigure}
-    \begin{subfigure}{.19\textwidth}
+    \begin{subfigure}{.195\textwidth}
       \centering
       \includegraphics[width=.95\linewidth]{../results/carseqrects_199.png}
       \caption{frame 200}
     \end{subfigure}
-    \begin{subfigure}{.19\textwidth}
+    \begin{subfigure}{.195\textwidth}
       \centering
       \includegraphics[width=.95\linewidth]{../results/carseqrects_299.png}
       \caption{frame 300}
     \end{subfigure}
-    \begin{subfigure}{.19\textwidth}
+    \begin{subfigure}{.195\textwidth}
       \centering
       \includegraphics[width=.95\linewidth]{../results/carseqrects_399.png}
       \caption{frame 400}
@@ -117,6 +117,43 @@ Please find the results of Lucas-Kanade tracking results in Figure.~\ref{fig:q1.
 
 \newpage
 \subsection*{Q1.4}
+
+Please note that for the implementation for this question, I wrote a function \code{LucasKanadeTrackerWithTemplateCorrection()} in \code{LucasKanade.py}, which handles the routine of Lucas Kanada tracking with template correction.
+
+Please find the results from Lucas-Kanade Tracking with template correction in Figure.~\ref{fig:q1.4}, with the comparison to that without template update. We can clearly see that the tracking with template correction yields a better result for later frames.
+
+\begin{figure}[h!]
+    \begin{subfigure}{.195\textwidth}
+      \centering
+      \includegraphics[width=.95\linewidth]{../results/carseqrects-wrct_0.png}
+      \caption{frame 1}
+    \end{subfigure}
+    \begin{subfigure}{.195\textwidth}
+      \centering
+      \includegraphics[width=.95\linewidth]{../results/carseqrects-wrct_99.png}
+      \caption{frame 100}
+    \end{subfigure}
+    \begin{subfigure}{.195\textwidth}
+      \centering
+      \includegraphics[width=.95\linewidth]{../results/carseqrects-wrct_199.png}
+      \caption{frame 200}
+    \end{subfigure}
+    \begin{subfigure}{.195\textwidth}
+      \centering
+      \includegraphics[width=.95\linewidth]{../results/carseqrects-wrct_299.png}
+      \caption{frame 300}
+    \end{subfigure}
+    \begin{subfigure}{.195\textwidth}
+      \centering
+      \includegraphics[width=.95\linewidth]{../results/carseqrects-wrct_399.png}
+      \caption{frame 400}
+    \end{subfigure}\hfill
+    \caption{Lucas-Kanade Tracking Results with Template Correction (in yellow boxes). The performance of the baseline tracker in \textbf{Q1.3} is in green boxes. }
+    \label{fig:q1.4}
+\end{figure}
+
+\newpage
+\subsection*{Q2.1}
 
 
 

@@ -62,3 +62,62 @@ class LucasKanadeTracker():
 
     def get_rect(self):
         return self.rect.copy()
+
+def getTemplate(frame, rect):
+    h, w = frame.shape
+    interp = RectBivariateSpline(np.arange(h), np.arange(w), frame)
+    X = np.arange(rect[0, 0], rect[2, 0]+1, 1)
+    Y = np.arange(rect[1, 0], rect[3, 0]+1, 1)
+    template = interp(Y, X)
+    return template
+
+class LucasKanadeTrackerWithTemplateCorrection():
+    def __init__(self, rect, frame):
+        self.init_rect = rect
+        self.init_frame = frame
+
+        # Get the initial template
+        self.init_template = getTemplate(self.init_frame, self.init_rect)
+        # Here, we explicit separate the template and keep it in a standalone variable
+        self.template = self.init_template.copy()
+        self.template_rect = np.array([[0], [0], [self.init_rect[2] - self.init_rect[0]], [self.init_rect[3]-self.init_rect[1]]], dtype=float)
+
+        self.p0 = self.init_rect[:2, 0].reshape(-1)
+        self.p = self.p0.copy()
+
+        self.rect = None
+        self.rect_star = None
+
+    def update(self, f1, f2):
+        # Ordinary tracking the template in the last frame to the next frame
+        pn = LucasKanade(self.template, f2, self.template_rect, self.p) # from p_{n-1}
+
+        rect = self.template_rect.copy()
+        rect[0] += pn[0]
+        rect[2] += pn[0]
+        rect[1] += pn[1]
+        rect[3] += pn[1]
+        self.rect = rect
+
+        # Try to recover the initial template
+        # By track the initial template from pn to the next frame
+        pnstar = LucasKanade(self.init_template, f2, self.template_rect, pn) # from p_n
+
+        rect_star = self.template_rect.copy()
+        rect_star[0] += pnstar[0]
+        rect_star[2] += pnstar[0]
+        rect_star[1] += pnstar[1]
+        rect_star[3] += pnstar[1]
+        self.rect_star = rect_star
+
+        # If small change, then get the template from the pnstar
+        # Else, keep the template unchanged
+        if np.linalg.norm(pn-pnstar, ord=1) <= 0.1:
+            self.template = getTemplate(f2, rect_star)
+        else:
+            pass
+
+        self.p = pn
+
+    def get_rect(self):
+        return self.rect_star

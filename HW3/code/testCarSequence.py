@@ -46,9 +46,10 @@ def visualizeTracker(frames, rects_list, img_save_name, save_frame=[0,99,199,299
             ax.add_patch(r)
             ax.set_xticks([])
             ax.set_yticks([])
-            if i in save_frame:
-                print("Saving ../results/%s_%d.png" % (img_save_name, i))
-                fig.savefig("../results/%s_%d.png" % (img_save_name, i), bbox_inches='tight')
+            
+        if i in save_frame:
+            print("Saving ../results/%s_%d.png" % (img_save_name, i))
+            fig.savefig("../results/%s_%d.png" % (img_save_name, i), bbox_inches='tight')
 
         # Close the window after animation
         if i == frames.shape[2]-1:
