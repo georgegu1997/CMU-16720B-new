@@ -120,4 +120,4 @@ class LucasKanadeTrackerWithTemplateCorrection():
         self.p = pn
 
     def get_rect(self):
-        return self.rect_star
+        return self.rect_star.copy()

@@ -36,17 +36,22 @@ def visualizeTracker(frames, rects_list, img_save_name, save_frame=[0,99,199,299
         show = (show*255).astype(np.uint8)
         ax.imshow(show)
 
+        rects_to_draw = []
         for j, rects in enumerate(rects_list):
             c = colors[j]
             x1, y1, x2, y2 = rects[i]
             # Create a Rectangle patch
             r = patches.Rectangle((x1,y1),(x2-x1),(y2-y1),linewidth=1,edgecolor=c,facecolor='none')
 
-            # Add the patch to the Axes
+            rects_to_draw.append(r)
+
+        # Add the patches to the Axes
+        for r in rects_to_draw[::-1]:
             ax.add_patch(r)
-            ax.set_xticks([])
-            ax.set_yticks([])
-            
+
+        ax.set_xticks([])
+        ax.set_yticks([])
+
         if i in save_frame:
             print("Saving ../results/%s_%d.png" % (img_save_name, i))
             fig.savefig("../results/%s_%d.png" % (img_save_name, i), bbox_inches='tight')

@@ -155,7 +155,69 @@ Please find the results from Lucas-Kanade Tracking with template correction in F
 \newpage
 \subsection*{Q2.1}
 
+From the Eq. 6 of the handout, for $w_i$
 
+\begin{align}
+    & \B_i^T(\x)(\I_{t+1}(\x) - \I_t(\x)) = \B_i^T(\x)(\sum_{k=1}^K w_k \B_k (\x))\\
+    \Rightarrow & \B_i(\x)^T(\I_{t+1}(\x) - \I_t(\x)) = w_i \B_i^T(\x) \B_i(\x) = w_i \\
+    \Rightarrow & w_i = \B_i^T(\x) (\I_{t+1}(\x) - \I_t(\x)).
+\end{align}
 
+Therefore, for the vector $\w$
+
+\begin{equation}
+    \w =
+    \begin{bmatrix}
+    \B_1^T (\x) \\ \B_2^T (\x) \\ \cdots \\ \B_K^T (\x)
+    \end{bmatrix}
+    (\I_{t+1}(\x) - \I_t(\x)).
+\end{equation}
+
+\newpage
+\subsubsection*{Q2.2}
+
+The optimization task can be converted to:
+
+\begin{equation}
+    \arg\min_{\Delta \p} \| \mathbf{B}^\bot(\A\Delta \p -\mathbf{b}) \|^2_2
+    = \arg\min_{\Delta \p} \| (\mathbf{I}-\mathbf{B}\mathbf{B}^T)\A\Delta\p - (\mathbf{I}-\mathbf{B}\mathbf{B}^T)\mathbf{b}\|^2_2.
+\end{equation}
+
+And the above problem can be solved as a least square problem.
+
+\newpage
+\subsubsection*{Q2.3}
+
+Please find the results from Lucas-Kanade Tracking with appearance basis in Figure.~\ref{fig:q2.3}, with the comparison to the baseline tracker in \textbf{Q1.3}. We can see that the performance of the two trackers are almost the same, and their bounding boxes basically overlaps with each other. This is probably because as the baseline tracker update its template in every iteration, it can account for some changes of template appearance.
+
+\begin{figure}[h!]
+    \begin{subfigure}{.195\textwidth}
+      \centering
+      \includegraphics[width=.95\linewidth]{../results/sylvseqrects_0.png}
+      \caption{frame 1}
+    \end{subfigure}
+    \begin{subfigure}{.195\textwidth}
+      \centering
+      \includegraphics[width=.95\linewidth]{../results/sylvseqrects_199.png}
+      \caption{frame 200}
+    \end{subfigure}
+    \begin{subfigure}{.195\textwidth}
+      \centering
+      \includegraphics[width=.95\linewidth]{../results/sylvseqrects_299.png}
+      \caption{frame 300}
+    \end{subfigure}
+    \begin{subfigure}{.195\textwidth}
+      \centering
+      \includegraphics[width=.95\linewidth]{../results/sylvseqrects_349.png}
+      \caption{frame 350}
+    \end{subfigure}
+    \begin{subfigure}{.195\textwidth}
+      \centering
+      \includegraphics[width=.95\linewidth]{../results/sylvseqrects_399.png}
+      \caption{frame 400}
+    \end{subfigure}\hfill
+    \caption{Lucas-Kanade Tracking Results with Appearance Basis (in yellow boxes). The performance of the baseline tracker in \textbf{Q1.3} is in green boxes. }
+    \label{fig:q2.3}
+\end{figure}
 
 \end{document}
