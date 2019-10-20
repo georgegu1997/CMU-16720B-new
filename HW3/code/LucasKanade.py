@@ -61,4 +61,4 @@ class LucasKanadeTracker():
         self.rect[3] += dp[1]
 
     def get_rect(self):
-        return self.rect
+        return self.rect.copy()

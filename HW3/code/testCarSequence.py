@@ -6,7 +6,6 @@ import matplotlib.patches as patches
 # write your script here, we recommend the above libraries for making your animation
 
 from LucasKanade import LucasKanadeTracker
-import cv2
 
 # '''[p1:p3, p0:p2]'''
 INPUT_NPY = "../data/carseq.npy"
@@ -14,45 +13,66 @@ INIT_RECT = [[59], [116], [145], [151]]
 IMG_SAVE_NAME = "carseqrects"
 RESULTS_SAVE_PATH = "../results/carseqrects.npy"
 
-def runTracker(frames, init_rect, trackers, img_save_name, results_save_path=None, to_show=False, save_frame=[0, 99, 199, 299, 399]):
-    COLORS = [[0,255,255], [0,255,0]]
+'''
+Given a video and the tracking results, visualize the results using animation
+'''
+def visualizeTracker(frames, rects_list, img_save_name, save_frame=[0,99,199,299,399], colors=['y', 'g']):
+    # Creating figure and ax
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+
+    #do nothing
+    def init():
+        pass
+
+    '''
+    function for updating one frame
+    '''
+    def animate(i):
+        ax.clear()
+        It = frames[:,:,i]
+        # Convert the grayscale to RGB for display
+        show = np.stack([It] * 3, axis=2)
+        show = (show*255).astype(np.uint8)
+        ax.imshow(show)
+
+        for j, rects in enumerate(rects_list):
+            c = colors[j]
+            x1, y1, x2, y2 = rects[i]
+            # Create a Rectangle patch
+            r = patches.Rectangle((x1,y1),(x2-x1),(y2-y1),linewidth=1,edgecolor=c,facecolor='none')
+
+            # Add the patch to the Axes
+            ax.add_patch(r)
+            ax.set_xticks([])
+            ax.set_yticks([])
+            if i in save_frame:
+                print("Saving ../results/%s_%d.png" % (img_save_name, i))
+                fig.savefig("../results/%s_%d.png" % (img_save_name, i), bbox_inches='tight')
+
+        # Close the window after animation
+        if i == frames.shape[2]-1:
+            plt.close(fig)
+
+    ani = animation.FuncAnimation(fig, animate, init_func=init, interval=30, frames=frames.shape[2], repeat=False)
+    plt.show()
+
+'''
+Wrapper function to run a given tracker and return the result rectangles
+'''
+def runTracker(frames, init_rect, tracker):
     results = []
+    results.append(init_rect)
 
     for i in range(frames.shape[2] - 1):
         It = frames[:,:,i]
         It1 = frames[:,:,i+1]
 
-        # Convert gray image to RGB one
-        if to_show or i in save_frame:
-            show = cv2.cvtColor((It1*255).astype(np.uint8),cv2.COLOR_GRAY2RGB)
+        tracker.update(It, It1)
+        rect = tracker.get_rect()
+        results.append(rect)
 
-        for j, tracker in enumerate(trackers):
-            tracker.update(It, It1)
-            rect = tracker.get_rect()
-
-            # Only save the results from the last tracker
-            if j == len(trackers) - 1 :
-                results.append(rect)
-
-            # Draw the rectangle for each tracker
-            if to_show or i in save_frame:
-                cv2.rectangle(show, (rect[0], rect[1]), (rect[2], rect[3]), COLORS[j], 2)
-
-        if to_show:
-            cv2.imshow("", show)
-            cv2.waitKey(0) # press any key to exit
-        if i in save_frame:
-            print("Saving ../results/%s_%d.png" % (img_save_name, i))
-            cv2.imwrite("../results/%s_%d.png" % (img_save_name, i), show)
-
-    if to_show:
-        cv2.destroyAllWindows()
-
-    results = np.array(results)
-    if not results_save_path is None:
-        print("Saveing", results_save_path)
-        np.save(results_save_path, results)
-
+    results = np.stack(results, axis=0).squeeze()
     return results
 
 def main():
@@ -60,9 +80,18 @@ def main():
     frame0 = frames[:,:,0]
     rect0 = np.array(INIT_RECT, dtype=float)
 
-    trackers = []
-    trackers.append(LucasKanadeTracker(rect0))
-    results = runTracker(frames, INIT_RECT, trackers, IMG_SAVE_NAME, RESULTS_SAVE_PATH, to_show=True)
+    tracker = LucasKanadeTracker(rect0)
+
+    print("Running LucasKanadeTracker", end="...")
+    results = runTracker(frames, rect0, tracker)
+    print("Done")
+
+    print("Saving result of LucasKanadeTracker to:", RESULTS_SAVE_PATH)
+    np.save(RESULTS_SAVE_PATH, results)
+
+    print("Visualizing results of LucasKanadeTracker...")
+    visualizeTracker(frames, [results], IMG_SAVE_NAME)
+    print("Visualization Done")
 
 if __name__ == '__main__':
     main()
