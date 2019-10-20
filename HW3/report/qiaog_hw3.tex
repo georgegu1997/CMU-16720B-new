@@ -220,4 +220,70 @@ Please find the results from Lucas-Kanade Tracking with appearance basis in Figu
     \label{fig:q2.3}
 \end{figure}
 
+\newpage
+\subsection*{Q3.1}
+
+Previously, for only translation, the gradient of warping function $\W$ w.r.t the parameters $\p$, is in Eq. \ref{warp_gradient_translation}. Now, since
+
+\begin{align}
+    \W(\x; \p) &=
+    \begin{bmatrix}
+        (1+p_1)x+p_2 y+p_3 \\
+        p_4 x+(1+p_5) y +p_6
+    \end{bmatrix}
+    \\ \Rightarrow
+    \frac{\partial \W(\x; \p)} {\partial \p^T} &=
+    \begin{bmatrix}
+        x&y&1&0&0&0 \\
+        0&0&0&x&y&1
+    \end{bmatrix}.
+\end{align}
+
+Now go back to the Eq. 4 in the handout and Eq. \ref{ls}:
+\newcommand {\Wxdp} {\W(\x;\p+\Delta \p)}
+\newcommand {\Wxp} {\W(\x;\p)}
+
+\begin{align} \label{general_warping_expansion}
+    \I_{t+1}(\Wxdp)
+    & \approx
+    \I_{t+1}(\x')+
+    \frac{\partial \I_{t+1}(\x')}{\partial(\x')^T}
+    \frac{\partial \W(\x; \p)} {\partial \p^T} \Delta \p
+    \\ \Rightarrow
+    \I_{t+1}(\Wxdp) - \I_t(\x)
+    & \approx
+    \I_{t+1} (\x') +
+    \frac {\partial \I_{t+1}(\x')} {\partial(\x')^T}
+    \frac{\partial \W(\x; \p)} {\partial \p^T}
+    \Delta \p - \I_t(\x) \\
+    &= \nabla \I_{t+1}(\x')
+    \frac{\partial \W(\x; \p)} {\partial \p^T}
+    \Delta \p - (\I_t(\x) - \I_{t+1} (\x')),
+\end{align}
+
+where $\x'=\Wxp$. Therefore, the optimzation object in Eq. \ref{eq:q1.1LS} becomes:
+
+\begin{equation} \label{general_optimization_object}
+    \arg\min_{\Delta \p}
+    \left \|
+    \begin{bmatrix}
+        \nabla \I_{t+1}(\x_1') \frac{\partial\W(\x_1;\p)}{\partial \p^T} \\
+        \nabla \I_{t+1}(\x_2') \frac{\partial\W(\x_2;\p)}{\partial \p^T} \\
+        \cdots\\
+        \nabla \I_{t+1}(\x_D') \frac{\partial\W(\x_D;\p)}{\partial \p^T}
+    \end{bmatrix}
+    \Delta \p -
+    \begin{bmatrix}
+        \I_t(\x_1) - \I_{t+1} (\x_1')\\
+        \I_t(\x_2) - \I_{t+1} (\x_2')\\
+        \cdots\\
+        \I_t(\x_D) - \I_{t+1} (\x_D')\\
+    \end{bmatrix}
+    \right \|
+    =
+    \arg\min_{\Delta \p}
+    \| \A_{affine}\Delta\p - \mathbf{b} \|
+\end{equation}
+
+
 \end{document}
