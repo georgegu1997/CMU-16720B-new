@@ -33,7 +33,7 @@ def SubtractDominantMotion(image1, image2):
     # Debugging
     # mask = np.absolute(warped_image1 - image2)
 
-    mask = np.absolute(warped_image1 - image2) > 0.15
+    mask = np.absolute(warped_image1 - image2) > 0.1
     mask = np.logical_and(mask, warped_valid_mask)
 
     return mask

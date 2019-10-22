@@ -221,7 +221,7 @@ Please find the results from Lucas-Kanade Tracking with appearance basis in Figu
 \end{figure}
 
 \newpage
-\subsection*{Q3.1}
+\subsection*{Q3.1} \label{LK_affine}
 
 Previously, for only translation, the gradient of warping function $\W$ w.r.t the parameters $\p$, is in Eq. \ref{warp_gradient_translation}. Now, since
 
@@ -284,6 +284,108 @@ where $\x'=\Wxp$. Therefore, the optimzation object in Eq. \ref{eq:q1.1LS} becom
     \arg\min_{\Delta \p}
     \| \A_{affine}\Delta\p - \mathbf{b} \|
 \end{equation}
+
+\newpage
+\subsection*{Q3.3}
+
+Please find the results of moving object detection in Figure.~\ref{fig:q3.3}. Please note that I used a threshold of $0.1$ in \code{SubtractDominantMotion()} to determine whether the difference is dominant. and in the figures shown below, the masks have been dilated using a structure of $3\times3$ matrix for better demostration, but the masks stored in \code{aerialseqrects.npy} are not dilated.
+
+\begin{figure}[h!]
+    \begin{subfigure}{.24\textwidth}
+      \centering
+      \includegraphics[width=.8\linewidth]{../results/aerialseq_29.png}
+      \caption{frame 30}
+    \end{subfigure}
+    \begin{subfigure}{.24\textwidth}
+      \centering
+      \includegraphics[width=.8\linewidth]{../results/aerialseq_59.png}
+      \caption{frame 60}
+    \end{subfigure}
+    \begin{subfigure}{.24\textwidth}
+      \centering
+      \includegraphics[width=.8\linewidth]{../results/aerialseq_89.png}
+      \caption{frame 90}
+    \end{subfigure}
+    \begin{subfigure}{.24\textwidth}
+      \centering
+      \includegraphics[width=.8\linewidth]{../results/aerialseq_119.png}
+      \caption{frame 120}
+    \end{subfigure}
+    \caption{Lucas-Kanade Tracking with Affine Motion Subtration.}
+    \label{fig:q3.3}
+\end{figure}
+
+\newpage
+\subsection*{Q4.1}
+
+Consider the inverse composition, the optimzation target in Eq. \ref{general_warping_expansion} becomes
+
+\begin{align}
+    \I_t(\W(\x, \mathbf{0}+\Delta \p)) & \approx
+    \I_t (\x) +
+    \frac{\partial \I_{t}(\x)}{\partial\x^T}
+    \frac{\partial \W(\x; \mathbf{0})} {\partial \p^T} \Delta \p \\
+    \Rightarrow
+    \I_{t+1}(\Wxp)-\I_t(\W(\x, \mathbf{0}+\Delta \p)) &=
+    -(\frac{\partial \I_{t}(\x)}{\partial\x^T}
+    \frac{\partial \W(\x; \mathbf{0})} {\partial \p^T} \Delta \p
+    - (\I_{t+1}(\x') - \I_t(\x)) ).
+\end{align}
+
+And then the optimzation object in Eq. \ref{general_optimization_object} becomes
+
+\begin{equation} \label{inverse_optimization_object}
+    \arg\min_{\Delta \p}
+    \left \|
+    \begin{bmatrix}
+        \nabla \I_{t}(\x_1) \frac{\partial\W(\x_1;\mathbf{0})}{\partial \p^T} \\
+        \nabla \I_{t}(\x_2) \frac{\partial\W(\x_2;\mathbf{0})}{\partial \p^T} \\
+        \cdots\\
+        \nabla \I_{t}(\x_D) \frac{\partial\W(\x_D;\mathbf{0})}{\partial \p^T}
+    \end{bmatrix}
+    \Delta \p -
+    \begin{bmatrix}
+        - \I_t(\x_1) + \I_{t+1} (\x_1')\\
+        - \I_t(\x_2) + \I_{t+1} (\x_2')\\
+        \cdots\\
+        - \I_t(\x_D) + \I_{t+1} (\x_D')\\
+    \end{bmatrix}
+    \right \|
+    =
+    \arg\min_{\Delta \p}
+    \| \A_{inv}\Delta\p - \mathbf{b}_{inv} \|
+\end{equation}
+
+By solving the above equation, we can get $\Delta \p$ and thus $\Delta \mathbf{M}$. Then we can update $\mathbf{M}=\mathbf{M} (\Delta \mathbf{M})^{-1}$.
+
+Compare to the method in section \textbf{Q3.1}, in the computation of $A_{inv}$ in the inverse composition algothm, both $\nabla \I_{t}(\x)$ and $\frac{\partial\W(\x;\mathbf{0})}{\partial \p^T}$ do not depend on the value of $\p$, and thus not related to the update of $\mathbf{M}$. Therefore, the inverse composition method can pre-compute the matrix $A_{inv}$ before iterations start, and  the computation cost of each iteration can be reduced.
+
+\newpage
+\subsection*{Q4.2}
+
+The expression
+
+\newcommand {\g} {\mathbf{g}}
+\newcommand {\X} {\mathbf{X}}
+\newcommand {\y} {\mathbf{y}}
+
+\begin{equation}
+    % \arg\min_\g
+    \frac{1}{2} \| \y-\X^T \g\|_2^2 + \frac{\lambda}{2} \|\g\|_2^2
+\end{equation}
+
+is convex. Take the gradient of the expression over $\g$ and make it equal to $\mathbf{0}$, we get
+
+\begin{align}
+    -\X(\y-\X^T\g) + \lambda \g &= \mathbf{0} \\
+    \Rightarrow (\X\X^T+\lambda\mathbf{I})\g &= \X\y \\
+    \Rightarrow \g &= (\mathbf{S}+\lambda\mathbf{I})^{-1} \X\y
+\end{align}
+
+\newpage
+\subsection*{Q4.3}
+
+
 
 
 \end{document}

@@ -79,12 +79,63 @@ def animate(i):
         return [cropax, patch, all_patchax]
     else:  # Stuff to do after the animation ends
         fig3d = plt.figure()
-        ax3d = fig3d.add_subplot(111, projection='3d')
+
+        '''Use the following line for matplotlib version over 0.99'''
+        ax3d = Axes3D(fig3d)
+        '''Use the following line for matplotlib version under 1.00'''
+        # ax3d = fig3d.add_subplot(111, projection='3d')
+
         ax3d.plot_surface(dpx.reshape(dsize), dpy.reshape(dsize),
                           Y.reshape(dsize), cmap=plt.get_cmap('coolwarm'))
 
         # Place your solution code for question 4.3 here
         plt.show()
+
+        # Solve for the filter g
+        S = X.dot(X.T)
+        XY = X.dot(Y)
+
+        # The ground truth
+        plt.imshow(x, cmap=plt.get_cmap('gray'))
+        plt.savefig("../../results/q4_3_gt.png")
+
+        # lambda = 0
+        g = np.linalg.inv(S).dot(XY)
+        g = g.reshape(dsize)
+        plt.imshow(g, cmap=plt.get_cmap('gray'))
+        plt.savefig("../../results/q4_3_lambda_0.png")
+
+        # correlate with the image
+        corr = correlate(img, g)
+        plt.imshow(corr, cmap=plt.get_cmap('gray'))
+        plt.savefig("../../results/q4_3_lambda_0_corr.png")
+
+        # convolve with the image
+        conv = convolve(img, g)
+        plt.imshow(conv, cmap=plt.get_cmap('gray'))
+        plt.savefig("../../results/q4_3_lambda_0_conv.png")
+
+        # lambda = 1
+        g = np.linalg.inv(S+1*np.eye(S.shape[0])).dot(XY)
+        g = g.reshape(dsize)
+        plt.imshow(g, cmap=plt.get_cmap('gray'))
+        plt.savefig("../../results/q4_3_lambda_1.png")
+
+        # correlate with the image
+        corr = correlate(img, g)
+        plt.imshow(corr, cmap=plt.get_cmap('gray'))
+        plt.savefig("../../results/q4_3_lambda_1_corr.png")
+
+        # convolve with the image
+        conv = convolve(img, g)
+        plt.imshow(conv, cmap=plt.get_cmap('gray'))
+        plt.savefig("../../results/q4_3_lambda_1_conv.png")
+
+        # convolve the image with the flipped filter
+        conv_flip = convolve(img, np.flip(g, (0,1)))
+        plt.imshow(conv_flip, cmap=plt.get_cmap('gray'))
+        plt.savefig("../../results/q4_3_lambda_1_conv_flip.png")
+
         return []
 
 
