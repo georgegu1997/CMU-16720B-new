@@ -91,7 +91,7 @@ def main():
 
     masks_save = masks[:,:,[29,59,89,119]]
     print("Saving masks_save:", masks_save.shape)
-    np.save("../results/aerialseqrects.npy", masks_save)
+    np.save("../results/aerialseqmasks.npy", masks_save)
 
     visualizeMotion(frames, masks, img_save_name=IMG_SAVE_NAME, save_frame=SAVE_FRAME)
 

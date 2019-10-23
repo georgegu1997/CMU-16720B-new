@@ -385,7 +385,76 @@ is convex. Take the gradient of the expression over $\g$ and make it equal to $\
 \newpage
 \subsection*{Q4.3}
 
+\textbf{ATTENTION: } According to https://stackoverflow.com/questions/3810865/matplotlib-unknown-projection-3d-error, the provided code is actually not compatible \code{matplotlib} of version higher than 0.99, which is a quite old version. To make the code compatible with newer version, I have made additional \code{import} and changed some of the provided code. Please see comments in the script for detail and make necessary changes to run the program.
 
+As we can see from the visualization in Figure.~\ref{fig:q4.3.1}, the result $\g$ from $\lambda=0$ is noisier than that from $\lambda=1$.
+
+\begin{figure}[h!]
+    \begin{subfigure}{.325\textwidth}
+      \centering
+      \includegraphics[width=.8\linewidth]{../results/q4_3_gt.png}
+      \caption{Template}
+    \end{subfigure}
+    \begin{subfigure}{.325\textwidth}
+      \centering
+      \includegraphics[width=.8\linewidth]{../results/q4_3_lambda_0.png}
+      \caption{$\g$ when $\lambda=0$}
+    \end{subfigure}
+    \begin{subfigure}{.325\textwidth}
+      \centering
+      \includegraphics[width=.8\linewidth]{../results/q4_3_lambda_1.png}
+      \caption{$\g$ when $\lambda=1$}
+    \end{subfigure}\hfill
+    \caption{Visualization of the Ground Truth Template and the Linear Discriminant for Different $\lambda$'s}
+    \label{fig:q4.3.1}
+\end{figure}
+
+The results from correlation are shown in Figure.~\ref{fig:q4.3.2}, from which we can see that the filter from $\lambda=1$ gives a better result as there is a clear white pixel in the left eye region in Figure.~\ref{fig:q4.3.2}(b).
+
+After examining the response values of these two version, we find that actually in the template region, the response are almost the same, but for $\lambda=0$, the correlation response has high values (larger than 1) outside the template region, which makes the maximum of the whole response not at the desired position (center of the template).
+
+Considering that we are to a learn a filter that can discriminate the template from its shifted version, the regularization term $||\g||^2_2$ here probably provides better ability to generalize such discriminating skill outside the template region. And this is also called preventing overfitting using regularization. I believe this is the reason why the correlation filter works better when $\lambda=1$.
+
+\begin{figure}[h!]
+    \begin{subfigure}{.49\textwidth}
+      \centering
+      \includegraphics[width=.8\linewidth]{../results/q4_3_lambda_0_corr.png}
+      \caption{$\lambda=0$}
+    \end{subfigure}
+    \begin{subfigure}{.49\textwidth}
+      \centering
+      \includegraphics[width=.8\linewidth]{../results/q4_3_lambda_1_corr.png}
+      \caption{$\lambda=1$}
+    \end{subfigure}
+    \caption{Correlation Results with Different $\lambda$. }
+    \label{fig:q4.3.2}
+\end{figure}
+
+\newpage
+\subsection*{Q4.4}
+
+Comparing Figure.~\ref{fig:q4.3.2}(b) and Figure.~\ref{fig:q4.4}(a), we can see the difference between the correlation result and convolution result. This is because the convolution can be regarded as correlation with a flipped filter:
+
+\begin{align}
+  (g*x)[i, j] = \sum_m \sum_n g[m, n] x[i-m, j-n]
+\end{align}
+
+Therefore, we can just flip the filter (in both height and width dimensions) to make convolution yield the result as that from correlation, as shown in Figure.~\ref{fig:q4.4}(b).
+
+\begin{figure}[h!]
+    \begin{subfigure}{.49\textwidth}
+      \centering
+      \includegraphics[width=.8\linewidth]{../results/q4_3_lambda_1_conv.png}
+      \caption{convolution with $\g$}
+    \end{subfigure}
+    \begin{subfigure}{.49\textwidth}
+      \centering
+      \includegraphics[width=.8\linewidth]{../results/q4_3_lambda_1_conv_flip.png}
+      \caption{convolution with flipped $\g$}
+    \end{subfigure}
+    \caption{Convolution Results with $\g$ and Flipped $\g$ while $\lambda=1$. }
+    \label{fig:q4.4}
+\end{figure}
 
 
 \end{document}
