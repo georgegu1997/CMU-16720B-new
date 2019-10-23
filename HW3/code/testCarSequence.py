@@ -83,6 +83,7 @@ def runTracker(frames, init_rect, tracker):
 
 def main():
     frames = np.load(INPUT_NPY)
+    print(frames.shape)
     frame0 = frames[:,:,0]
     rect0 = np.array(INIT_RECT, dtype=float)
 
@@ -93,6 +94,7 @@ def main():
     print("Done")
 
     print("Saving result of LucasKanadeTracker to:", RESULTS_SAVE_PATH)
+    print(results.shape)
     np.save(RESULTS_SAVE_PATH, results)
 
     print("Visualizing results of LucasKanadeTracker...")

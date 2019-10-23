@@ -288,7 +288,9 @@ where $\x'=\Wxp$. Therefore, the optimzation object in Eq. \ref{eq:q1.1LS} becom
 \newpage
 \subsection*{Q3.3}
 
-Please find the results of moving object detection in Figure.~\ref{fig:q3.3}. Please note that I used a threshold of $0.1$ in \code{SubtractDominantMotion()} to determine whether the difference is dominant. and in the figures shown below, the masks have been dilated using a structure of $3\times3$ matrix for better demostration, but the masks stored in \code{aerialseqrects.npy} are not dilated.
+Please find the results of moving object detection in Figure.~\ref{fig:q3.3}. Please note that I used a threshold of $0.1$ in \code{SubtractDominantMotion()} to determine whether the difference is dominant.
+
+\textbf{ATTENTION:} in the figures shown below, the masks have been dilated using a structure of $3\times3$ \code{np.ones()} matrix for better demostration, but the masks stored in \code{aerialseqrects.npy} are not dilated. And I have removed the false detection on the image border because of the camera motion. 
 
 \begin{figure}[h!]
     \begin{subfigure}{.24\textwidth}

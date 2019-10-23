@@ -1,5 +1,5 @@
 import os
-andrew_id = 'XXX'
+andrew_id = 'qiaog'
 
 
 def check_file(file):
@@ -8,9 +8,10 @@ def check_file(file):
     else:
         print('{} not found!'.format(file))
         return False
-    
+
 
 if ( check_file('../'+andrew_id+'/LucasKanade.py') and \
+     check_file('../'+andrew_id+'/LucasKanadeBasis.py') and \
      check_file('../'+andrew_id+'/LucasKanadeAffine.py') and \
      check_file('../'+andrew_id+'/SubtractDominantMotion.py') and \
      check_file('../'+andrew_id+'/InverseCompositionAffine.py') and \
@@ -21,6 +22,7 @@ if ( check_file('../'+andrew_id+'/LucasKanade.py') and \
      check_file('../'+andrew_id+'/carseqrects.npy') and \
      check_file('../'+andrew_id+'/carseqrects-wcrt.npy') and \
      check_file('../'+andrew_id+'/sylvseqrects.npy') and \
+     check_file('../'+andrew_id+'/aerialseqmasks.npy') and \
      check_file('../'+andrew_id+'/'+andrew_id+'_hw3.pdf') ):
     print('file check passed!')
 else:

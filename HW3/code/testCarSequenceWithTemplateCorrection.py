@@ -9,8 +9,8 @@ from testCarSequence import runTracker, visualizeTracker
 
 INPUT_NPY = "../data/carseq.npy"
 INIT_RECT = [[59], [116], [145], [151]]
-IMG_SAVE_NAME = "carseqrects-wrct"
-RESULTS_SAVE_PATH = "../results/carseqrects-wrct.npy"
+IMG_SAVE_NAME = "carseqrects-wcrt"
+RESULTS_SAVE_PATH = "../results/carseqrects-wcrt.npy"
 
 def main():
     frames = np.load(INPUT_NPY)
