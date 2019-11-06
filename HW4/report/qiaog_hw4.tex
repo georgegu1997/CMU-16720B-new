@@ -47,63 +47,63 @@ Consider the point $\mathbf{w}$ where the principle axes of the two cameras inte
     = \essential_{33} = 0
 \end{align}
 
-Suppose the intrinsic matrix for two cameras are
-
-\begin{align}
-    \intrinsic_1 =
-    \begin{bmatrix}
-        f_{1x} & \gamma_1 & 0 \\
-        0 & f_{1y} & 0 \\
-        0 & 0 & 1
-    \end{bmatrix}
-    \quad
-    \intrinsic_2 =
-    \begin{bmatrix}
-        f_{2x} & \gamma_2 & 0 \\
-        0 & f_{2y} & 0 \\
-        0 & 0 & 1
-    \end{bmatrix}
-\end{align}
-
-Then
-
-\begin{align}
-    \essential = \intrinsic_1^T \fundamental \intrinsic_2 &=
-    \begin{bmatrix}
-        f_{1x} & 0 & 0 \\
-        \gamma_1 & f_{1y} & 0 \\
-        0 & 0 & 1
-    \end{bmatrix}
-    \begin{bmatrix}
-        \fundamental_{11} & \fundamental_{12} & \fundamental_{13} \\
-        \fundamental_{21} & \fundamental_{22} & \fundamental_{23} \\
-        \fundamental_{31} & \fundamental_{32} & \fundamental_{33}
-    \end{bmatrix}
-    \begin{bmatrix}
-        f_{2x} & \gamma_2 & 0 \\
-        0 & f_{2y} & 0 \\
-        0 & 0 & 1
-    \end{bmatrix}
-    \\
-    &= \begin{bmatrix}
-        f_{1x} & 0 & 0 \\
-        \gamma_1 & f_{1y} & 0 \\
-        0 & 0 & 1
-    \end{bmatrix}
-    \begin{bmatrix}
-        \dots & \dots & \fundamental_{13} \\
-        \dots & \dots & \fundamental_{23} \\
-        \dots & \dots & \fundamental_{33} \\
-    \end{bmatrix}
-    =
-    \begin{bmatrix}
-        \dots & \dots & \dots \\
-        \dots & \dots & \dots \\
-        \dots & \dots & \fundamental_{33} \\
-    \end{bmatrix}
-\end{align}
-
+Since two cameras are normalized, the intrinsic matrices for them are identity:  $\intrinsic_1=\intrinsic_2=\mathbf{I}$.
+Then $\essential = \intrinsic_1^T \fundamental \intrinsic_2 = \essential$.
 Therefore, $\essential_{33} = \fundamental_{33}=0$.
+
+% Suppose the intrinsic matrix for two cameras are
+%
+% \begin{align}
+%     \intrinsic_1 =
+%     \begin{bmatrix}
+%         f_{1x} & \gamma_1 & 0 \\
+%         0 & f_{1y} & 0 \\
+%         0 & 0 & 1
+%     \end{bmatrix}
+%     \quad
+%     \intrinsic_2 =
+%     \begin{bmatrix}
+%         f_{2x} & \gamma_2 & 0 \\
+%         0 & f_{2y} & 0 \\
+%         0 & 0 & 1
+%     \end{bmatrix}
+% \end{align}
+
+% \begin{align}
+%     \essential = \intrinsic_1^T \fundamental \intrinsic_2 &=
+%     \begin{bmatrix}
+%         f_{1x} & 0 & 0 \\
+%         \gamma_1 & f_{1y} & 0 \\
+%         0 & 0 & 1
+%     \end{bmatrix}
+%     \begin{bmatrix}
+%         \fundamental_{11} & \fundamental_{12} & \fundamental_{13} \\
+%         \fundamental_{21} & \fundamental_{22} & \fundamental_{23} \\
+%         \fundamental_{31} & \fundamental_{32} & \fundamental_{33}
+%     \end{bmatrix}
+%     \begin{bmatrix}
+%         f_{2x} & \gamma_2 & 0 \\
+%         0 & f_{2y} & 0 \\
+%         0 & 0 & 1
+%     \end{bmatrix}
+%     \\
+%     &= \begin{bmatrix}
+%         f_{1x} & 0 & 0 \\
+%         \gamma_1 & f_{1y} & 0 \\
+%         0 & 0 & 1
+%     \end{bmatrix}
+%     \begin{bmatrix}
+%         \dots & \dots & \fundamental_{13} \\
+%         \dots & \dots & \fundamental_{23} \\
+%         \dots & \dots & \fundamental_{33} \\
+%     \end{bmatrix}
+%     =
+%     \begin{bmatrix}
+%         \dots & \dots & \dots \\
+%         \dots & \dots & \dots \\
+%         \dots & \dots & \fundamental_{33} \\
+%     \end{bmatrix}
+% \end{align}
 
 \newpage
 
@@ -175,7 +175,7 @@ The above deduction also holds if camera 1 and 2 are exchanged.
 
 \newcommand{\pointw}{\mathbf{w}}
 
-Assume $(\rotation_i, \translation_i)$ and $(\rotation_i, \translation_i)$ are the rotation and translation at time $i$ and time $j$. Then for a point $\point3d$ in the 3D world
+Assume $(\rotation_i, \translation_i)$ and $(\rotation_i, \translation_i)$ are the rotation and translation at time $i$ and time $j$. Then for a point $\pointw$ in the 3D world
 
 \begin{align}
     & \lambda_i \homox_i = \rotation_i \pointw + \translation_i, \quad
