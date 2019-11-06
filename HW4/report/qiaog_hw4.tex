@@ -208,7 +208,7 @@ Similarly we can see that any epipolar line in camera 1 has $\bl_2^T = [0 \; -t_
 
 \newcommand{\pointw}{\mathbf{w}}
 
-Assume $(\rotation_i, \translation_i)$ and $(\rotation_i, \translation_i)$ are the rotation and translation at time $i$ and time $j$. Then for a point $\pointw$ in the 3D world
+Assume $(\rotation_i, \translation_i)$ and $(\rotation_i, \translation_i)$ are the rotation and translation from the world coordinate frame to the camera coordinate frame at time $i$ and time $j$. And suppose $\rotation_{rel}$ and $\translation_{rel}$ are the rotation and translation from camera at time $i$ to the camera at time $j$. Then for a point $\pointw$ in the 3D world
 
 \begin{align}
     & \lambda_i \homox_i = \rotation_i \pointw + \translation_i, \quad
@@ -228,6 +228,13 @@ Therefore
 \begin{align}
     \rotation_{rel} = \rotation_j \rotation_i ^T, \quad
     \translation_{rel} = \translation_j - \rotation_j \rotation_i ^T \translation_i
+\end{align}
+
+Then the essential and fundamental matrix can be derived as
+
+\begin{align}
+  \essential &= (\translation_{rel})_\times \rotation_{rel} \\
+  \fundamental &= (\intrinsic^{-1})^T \fundamental \intrinsic^{-1} = (\intrinsic^{-1})^T (\translation_{rel})_\times \rotation_{rel} \intrinsic^{-1}
 \end{align}
 
 \newpage
