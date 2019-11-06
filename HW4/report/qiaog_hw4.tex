@@ -295,8 +295,24 @@ And visualization result is shown in Figure.~\ref{fig:q2.1}
 
 \subsection*{Q2.2}
 
+To expedite the process of searching for the best $F$, I iteratively choose 7 points randomly and keep $F$ with the minimum 2-norm difference from $F$ given by 8-point algorithm. And the best reasonable $F$ is given when I use the points at indices [ 10   3  92 108  41  30  99], which is
 
+\begin{verbatim}
+[[-1.29290341e-08  1.81485505e-07  8.27390734e-04]
+ [-3.52772006e-07  1.05936161e-09  4.14750371e-05]
+ [-7.87641850e-04 -1.90120686e-05 -4.69857949e-03]]
+\end{verbatim}
 
+And the visualization result is shown in Figure.~\ref{fig:q2.2}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.8\linewidth]{../results/q2_2.png}
+    \caption{The visualization results showing the fundamental matrix given by 7-point algorithm. }
+    \label{fig:q2.2}
+\end{figure}
+
+\newpage
 
 
 \end{document}

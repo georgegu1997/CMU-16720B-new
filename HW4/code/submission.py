@@ -28,7 +28,41 @@ def main():
 
     if sys.argv[1] == "2.2":
         print("test the sevenpoint() algorithm")
-        
+        F8p = np.load("../results/q2_1.npz")['F']
+        print(F8p)
+        M = max(*im1.shape[:2])
+
+        # Set up data for evaluating F
+        N = pts1.shape[0]
+        homo1 = np.hstack([pts1, np.ones((N,1))])
+        homo2 = np.hstack([pts2, np.ones((N,1))])
+
+        # Sample 7 correspondences randomly
+        # To expedite the searching process, I select F closest to that given by
+        # the eightpoint() algorithm.
+        best_F = None
+        best_error = 1e10
+        best_ind = None
+        best_pts = None
+        np.random.seed(2020)
+        for _ in range(200):
+            sample_ind = np.random.choice(np.arange(N), 7)
+            sample_pts1 = pts1[sample_ind]
+            sample_pts2 = pts2[sample_ind]
+            Farray = sevenpoint(sample_pts1, sample_pts2, M)
+            for F in Farray:
+                error = np.linalg.norm(F - F8p)
+                if error < best_error:
+                    best_F = F
+                    best_error = error
+                    best_ind = sample_ind
+                    best_pts = (sample_pts1, sample_pts2)
+        print("Best sample indices:", best_ind)
+        print("Best F from sampling with error:", best_error)
+        print(best_F)
+        np.savez("../results/q2_2.npz", F=best_F, M=M, pts1=best_pts[0], pts2=best_pts[1])
+
+        displayEpipolarF(im1, im2, best_F)
 
     pass
 
@@ -72,20 +106,66 @@ def eightpoint(pts1, pts2, M):
     # Rescale F using the normalization matrix
     F = T.T.dot(F).dot(T)
 
+    # print(np.linalg.norm(homo2.dot(F).dot(homo1.T)))
     return F
 
 
 '''
 Q2.2: Seven Point Algorithm
-    Input:  pts1, Nx2 Matrix
-            pts2, Nx2 Matrix
+    Input:  pts1, 7x2 Matrix
+            pts2, 7x2 Matrix
             M, a scalar parameter computed as max (imwidth, imheight)
     Output: Farray, a list of estimated fundamental matrix.
 '''
 def sevenpoint(pts1, pts2, M):
     # Replace pass by your implementation
-    pass
+    # Determine the normalization matrix and scale all the points
+    N, _ = pts1.shape
+    T = np.array([
+        [1.0/M, 0, 0],
+        [0, 1.0/M, 0],
+        [0, 0, 1.0]
+    ])
+    norm1, norm2 = pts1/M, pts2/M
+    homo1 = np.hstack([norm1, np.ones((N, 1))])
+    homo2 = np.hstack([norm2, np.ones((N, 1))])
 
+    # Construct A
+    A = np.hstack([homo2[:,0:1]*homo1, homo2[:,1:2]*homo1, homo1])
+
+    # SVD and get the two null space f1, f2 of A
+    u, s, vh = np.linalg.svd(A)
+    f1 = vh.T[:, -1]
+    f2 = vh.T[:, -2]
+    F1, F2 = f1.reshape((3,3)), f2.reshape((3,3))
+
+    # Finding the coefficient of det(a*F1 + (1-a)*F2)
+    # Reference: https://piazza.com/class/jzslw1sd69v31q?cid=258
+    fun = lambda a: np.linalg.det(a * F1 + (1 - a) * F2)
+    a0 = fun(0)
+    a1 = 2*(fun(1)-fun(-1))/3-(fun(2)-fun(-2))/12
+    a2 = 0.5*fun(1)+0.5*fun(-1)-fun(0)
+    a3 = fun(1)-a0-a1-a2
+
+    # solve for the roots of the above polynomial
+    roots = np.roots([a3, a2, a1, a0])
+    # print(roots)
+
+    # Construct the Farray by the real roots of alpha
+    Farray = []
+    for a in roots:
+        if np.isreal(a):
+            F = a*F1 + (1-a)*F2
+
+            # # Refine F using refineF()
+            # F = refineF(F, norm1, norm2)
+
+            # Rescale F using the normalization matrix
+            F = T.T.dot(F).dot(T)
+
+            Farray.append(F)
+
+    return Farray
 
 '''
 Q3.1: Compute the essential matrix E.
