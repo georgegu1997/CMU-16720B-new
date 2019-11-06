@@ -111,8 +111,10 @@ Therefore, $\essential_{33} = \fundamental_{33}=0$.
 
 \newcommand {\rotation} {\mathbf{R}}
 \newcommand {\translation} {\mathbf{t}}
+\newcommand {\bl} {\mathbf{l}}
 
-Suppose the cameras are normalized in the sense that their intrinsic matrices are both identity.
+Suppose the cameras are normalized in the sense that their intrinsic matrices are both identity:  $\intrinsic_1=\intrinsic_2=\mathbf{I}$.
+
 Now that the translation and rotation from camera 1 to camera 2 are
 
 \begin{align}
@@ -128,46 +130,77 @@ Now that the translation and rotation from camera 1 to camera 2 are
     \end{bmatrix}
 \end{align}
 
-According to the dfinition of essential matrix
+And thus the essential matrix are
 
 \begin{align}
-    \homox_2^T \translation \times \rotation \homox_1 &=
-    \homox_2^T \translation_\times \rotation \homox_1 =
-    \homox_2^T
-    \begin{bmatrix}
-        0 & 0 & 0 \\
-        0 & 0 & -t_x \\
-        0 & t_x & 0 \\
-    \end{bmatrix}
-    \begin{bmatrix}
-        1 & 0 & 0 \\
-        0 & 1 & 0 \\
-        0 & 0 & 1
-    \end{bmatrix}
-    \homox_1
-    \\ &=
-    \homox_2^T
-    \begin{bmatrix}
-        0 & 0 & 0 \\
-        0 & 0 & -t_x \\
-        0 & t_x & 0 \\
-    \end{bmatrix}
-    \homox_1 =
-    \begin{bmatrix}
-        x_2 & y_2 & 1
-    \end{bmatrix}
-    \begin{bmatrix}
-        0 \\ -t_x \\ t_x y_1
-    \end{bmatrix}
-    \\ &=
-    -t_x y_2 + t_x y_1 = 0
-    \\ & \Rightarrow
-    y_1 = y_2
+  \essential=\translation_\times \rotation=
+  \begin{bmatrix}
+    0 & 0 & 0 \\
+    0 & 0 & -t_x \\
+    0 & t_x & 0
+  \end{bmatrix}
 \end{align}
 
-For a certain epipolar line in camera 2, it has a fixed epipole with fixed $y_1$ in camera 1, and thus every 3D point on the corresponding incident ray to camera 1 has a projection with a fixed $y_2=y_1$ in camera 2, which means the epipolar line has a fixed $y$ coordinate, and thus parallel to x-axis.
+Therefore for an epipolar line in camera 1 $\bl_1^T \homox_1=0$ and $\homox_2^T \essential \homox_1 =0$, where $\homox_2$ is a fixed point on the image plane of camera 2 resulting from the ray corresponding to the epipolar line, then we can see that
 
-The above deduction also holds if camera 1 and 2 are exchanged.
+\begin{align}
+  \bl_1^T = \homox_2^T \essential =
+  \begin{bmatrix}
+    x_2 & y_2 & 1
+  \end{bmatrix}
+  \begin{bmatrix}
+    0 & 0 & 0 \\
+    0 & 0 & -t_x \\
+    0 & t_x & 0
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    0 & t_x & -t_x y_2
+  \end{bmatrix}
+\end{align}
+
+Similarly we can see that any epipolar line in camera 1 has $\bl_2^T = [0 \; -t_x \; t_xy_1]$. Since the first elements in both $\bl_1$ and $\bl_2$ are zero, the epipolar lines are parallel to $x$ axis.
+
+% According to the dfinition of essential matrix
+%
+% \begin{align}
+%     \homox_2^T \translation \times \rotation \homox_1 &=
+%     \homox_2^T \translation_\times \rotation \homox_1 =
+%     \homox_2^T
+%     \begin{bmatrix}
+%         0 & 0 & 0 \\
+%         0 & 0 & -t_x \\
+%         0 & t_x & 0 \\
+%     \end{bmatrix}
+%     \begin{bmatrix}
+%         1 & 0 & 0 \\
+%         0 & 1 & 0 \\
+%         0 & 0 & 1
+%     \end{bmatrix}
+%     \homox_1
+%     \\ &=
+%     \homox_2^T
+%     \begin{bmatrix}
+%         0 & 0 & 0 \\
+%         0 & 0 & -t_x \\
+%         0 & t_x & 0 \\
+%     \end{bmatrix}
+%     \homox_1 =
+%     \begin{bmatrix}
+%         x_2 & y_2 & 1
+%     \end{bmatrix}
+%     \begin{bmatrix}
+%         0 \\ -t_x \\ t_x y_1
+%     \end{bmatrix}
+%     \\ &=
+%     -t_x y_2 + t_x y_1 = 0
+%     \\ & \Rightarrow
+%     y_1 = y_2
+% \end{align}
+%
+% For a certain epipolar line in camera 2, it has a fixed epipole with fixed $y_1$ in camera 1, and thus every 3D point on the corresponding incident ray to camera 1 has a projection with a fixed $y_2=y_1$ in camera 2, which means the epipolar line has a fixed $y$ coordinate, and thus parallel to x-axis.
+%
+% The above deduction also holds if camera 1 and 2 are exchanged.
 
 \newpage
 
