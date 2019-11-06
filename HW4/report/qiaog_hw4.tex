@@ -241,7 +241,36 @@ Then the essential and fundamental matrix can be derived as
 
 \subsection*{Q1.4}
 
+\newcommand {\bv} {\mathbf{v}}
+\newcommand {\bH} {\mathbf{H}}
+\newcommand {\bI} {\mathbf{I}}
+\newcommand {\bw} {\mathbf{w}}
 
+Suppose the mirror is orthogonal to a unit vector $\bv$ pointing in to the mirror, then we can have the Householder transformation matrix $\bH=\bI - 2\bv\bv^T$. Suppose the real world coordinate has its origin at a point on the mirror, then for any point $\bw$ in the world coordinate, the mirror produce its reflection $\bw_2=\bH\bw_1=\bw_1 - 2\bv\bv^T\bw_1=\bw_1 + 2\alpha\bv$, where $\alpha=-\bv^T\bw_1$ is the dixed distance from $\bw_2$ to the mirror.
+
+This two points in 3D produce two point on the image plane as follows
+
+\begin{align}
+  \lambda_1\homox_1 &= \bw_1 \\
+  \lambda_2\homox_2 &= \bw_2 = \bw_1 + 2\alpha\bv
+\end{align}
+
+This is equivalent to a two-camera system where $\rotation=\bI$ and $\translation=2\alpha\bv$. Therefore
+
+\begin{align}
+  \essential = \translation_\times \rotation = 2\alpha\bv_\times \bI=2\alpha\bv_\times
+\end{align}
+
+is skew-symmetric. Since there are only one camera with only one intrinsic $\intrinsic$, for fundamental matrix
+
+\begin{align}
+  \fundamental = (\intrinsic^{-1})^T \essential \essential^{-1}
+  \fundamental^T = (\intrinsic^{-1})^T \essential^T \essential^{-1} = -(\intrinsic^{-1})^T \essential \essential^{-1} = -\fundamental
+\end{align}
+
+Therefore the fundamental matrix $\fundamental$ of this equivalent two-camera system is symmetric.
+
+\newpage
 
 
 
