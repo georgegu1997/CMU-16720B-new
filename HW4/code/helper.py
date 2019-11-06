@@ -7,7 +7,7 @@ Written by Chen Kong, 2018.
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.optimize
-import submission as sub
+# import submission as sub
 
 def _epipoles(E):
     U, S, V = np.linalg.svd(E)
@@ -106,6 +106,7 @@ def camera2(E):
     return M2s
 
 def epipolarMatchGUI(I1, I2, F):
+    import submission as sub
     e1, e2 = _epipoles(F)
 
     sy, sx, _ = I2.shape
