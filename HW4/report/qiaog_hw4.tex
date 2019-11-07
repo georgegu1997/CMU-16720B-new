@@ -314,5 +314,101 @@ And the visualization result is shown in Figure.~\ref{fig:q2.2}
 
 \newpage
 
+\subsection*{Q3.1}
+
+By applying the equation $\essential=\intrinsic_2^T \fundamental \intrinsic_1$, we can get the $\essential=$
+
+\begin{verbatim}
+[[ 2.26587820e-03 -3.06867395e-01  1.66257398e+00]
+ [-1.32799331e-01  6.91553934e-03 -4.32775554e-02]
+ [-1.66717617e+00 -1.33444257e-02 -6.72047195e-04]]
+\end{verbatim}
+
+\newpage
+
+\subsubsection*{Q3.2}
+
+\newcommand {\camera} {\mathbf{C}}
+\newcommand {\homow} {\tilde{\mathbf{w}}}
+\newcommand {\ct} {\camera^T}
+\newcommand {\bA} {\mathbf{A}}
+
+Suppose $\homow$ is the homogenuous coordinate of the 3D point $\bw$, and it projects $\homox_{i1}$ and $\homox_{i2}$ on camera 1 and camera 2 respectively, which means
+
+\begin{align}
+    \camera_1 \homow_i = \lambda_1\homox_{i1}, \quad \camera_2 \homow_i = \lambda_2\homox_{i2}
+\end{align}
+
+Now only consider $\camera_1 \homow = \lambda_1\homox_{i1}$. Suppose $\homox_{i1} = [x_{i1}, y_{i1}, 1]^T$ and $\ct_{11}, \ct_{12}, \ct_{13}$ are the first, the second, and the third row of the camera matrix $\camera_1$. We get
+
+\begin{align}
+    \begin{cases}
+        \lambda_1 x_{i1} &= \ct_{11} \homow_i \\
+        \lambda_1 y_{i1} &= \ct_{12} \homow_i \\
+        \lambda_1 &= \ct_{13} \homow_i
+    \end{cases}
+    \Rightarrow
+    \begin{cases}
+        x_{i1} \ct_{13} \homow_i &= \ct_{11} \homow_i \\
+        y_{i1} \ct_{13} \homow_i &= \ct_{12} \homow_i
+    \end{cases}
+    \Rightarrow
+    \begin{bmatrix}
+        x_{i1} \ct_{13} - \ct_{11}\\
+        y_{i1} \ct_{13} - \ct_{12}
+    \end{bmatrix}
+    \homow_i = \mathbf{0}
+\end{align}
+
+We can get Similar constraints from the projection on camera 2, and by concatenate the constraints together we can get $\bA_i\bw_i=0$ as follows:
+
+\begin{align}
+    \bA_i\bw_i =
+    \begin{bmatrix}
+        x_{i1} \ct_{13} - \ct_{11}\\
+        y_{i1} \ct_{13} - \ct_{12}\\
+        x_{i2} \ct_{23} - \ct_{21}\\
+        y_{i2} \ct_{23} - \ct_{22}
+    \end{bmatrix}
+    \homow_i = \mathbf{0}
+    \textrm{ and }
+    \bA_i =
+    \begin{bmatrix}
+        x_{i1} \ct_{13} - \ct_{11}\\
+        y_{i1} \ct_{13} - \ct_{12}\\
+        x_{i2} \ct_{23} - \ct_{21}\\
+        y_{i2} \ct_{23} - \ct_{22}
+    \end{bmatrix}
+\end{align}
+
+Then $\homow_i$ is in the null space of $\bA_i$, which we can get by solving SVD decomposition of $\bA_i$ and getting the last column of $V$.
+
+\newpage
+
+% Multiply each side with $\homox_{i1}$ and we get
+%
+% \begin{align}
+%     \homox_{i1} \times \camera_1 \homow_i &= \mathbf{0}
+%     \\ \Rightarrow  (\homox_{i1})_\times \camera_1 \homow_i &= \mathbf{0}
+%     \\ \Rightarrow
+%     \begin{bmatrix}
+%         0 & -1 & y_{i1} \\
+%         1 & 0 & -x_{i1} \\
+%         -y_{i1} & x_{i1} & 0 \\
+%     \end{bmatrix}
+%     \begin{bmatrix}
+%         \ct_{11} \\ \ct_{12} \\ \ct_{13}
+%     \end{bmatrix}
+%     \homow_i & = \mathbf{0}
+%     \\ \Rightarrow
+%     \begin{bmatrix}
+%         -\ct_{12} + y_{i1}\ct_{13} \\
+%         \ct_{11} - x_{i1}\ct_{13} \\
+%         -y_{i1}\ct_{11} + x_{i1}\ct_{12}
+%     \end{bmatrix}
+%      \homow_i & = \mathbf{0}
+% \end{align}
+%
+% Where $\homox_{i1} = [x_{i1}, y_{i1}, 1]^T$ and $\ct_{11}, \ct_{12}, \ct_{13}$ are the first, the second, and the third row of the camera matrix $\camera_1$.
 
 \end{document}

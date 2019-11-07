@@ -26,7 +26,7 @@ def main():
         np.savez("../results/q2_1.npz", F=F, M=M)
         displayEpipolarF(im1, im2, F)
 
-    if sys.argv[1] == "2.2":
+    elif sys.argv[1] == "2.2":
         print("test the sevenpoint() algorithm")
         F8p = np.load("../results/q2_1.npz")['F']
         print(F8p)
@@ -64,7 +64,13 @@ def main():
 
         displayEpipolarF(im1, im2, best_F)
 
-    pass
+    elif sys.argv[1] == "3.1":
+        print("Test essentialMatrix() function")
+        data = np.load("../data/intrinsics.npz")
+        K1, K2 = data["K1"], data["K2"]
+        F = np.load("../results/q2_1.npz")['F']
+        E = essentialMatrix(F, K1, K2)
+        print(E)
 
 '''
 Q2.1: Eight Point Algorithm
@@ -176,7 +182,8 @@ Q3.1: Compute the essential matrix E.
 '''
 def essentialMatrix(F, K1, K2):
     # Replace pass by your implementation
-    pass
+    E = K2.T.dot(F).dot(K1)
+    return E
 
 
 '''
@@ -190,8 +197,43 @@ Q3.2: Triangulate a set of 2D coordinates in the image to a set of 3D points.
 '''
 def triangulate(C1, pts1, C2, pts2):
     # Replace pass by your implementation
-    pass
+    N, _ = pts1.shape
+    # Construct A matrix
+    A = []
+    X1 = np.hstack([pts1, np.zeros((N, 2))]).reshape((-1,1))
+    X2 = np.hstack([np.zeros((N, 2)), pts2]).reshape((-1,1))
+    X = X1 + X2
 
+    C_left = np.vstack(([C1[2]]*2 + [C2[2]]*2) * N)
+    C_right = np.vstack([C1[:2], C2[:2]] * N)
+    A = X*C_left - C_right
+
+    # Solve for the 3D coordinate for each point respectively
+    P = []
+    err = 0
+    for i in range(N):
+        Ai = A[i*4:(i+1)*4]
+
+        U, S, Vh = np.linalg.svd(Ai)
+        wi = Vh.T[:,-1]
+        # normalize
+        wi = wi / wi[-1]
+        P.append(wi[:3])
+
+        # Calculate the reprojection error
+        x1_proj = C1.dot(wi)
+        x1_proj = x1_proj / x1_proj[-1]
+        x2_proj = C2.dot(wi)
+        x2_proj = x2_proj / x2_proj[-1]
+        x1, x2 = pts1[i], pts2[i]
+        this_err = np.linalg.norm(x1-x1_proj[:2])**2 + np.linalg.norm(x2-x2_proj[:2])**2
+        # print(this_err)
+        err += this_err
+
+    P = np.stack(P, axis=0)
+    # print(P.shape)
+    # print(err)
+    return P, err
 
 '''
 Q4.1: 3D visualization of the temple images.
