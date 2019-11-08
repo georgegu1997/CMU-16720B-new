@@ -383,8 +383,6 @@ We can get Similar constraints from the projection on camera 2, and by concatena
 
 Then $\homow_i$ is in the null space of $\bA_i$, which we can get by solving SVD decomposition of $\bA_i$ and getting the last column of $V$.
 
-\newpage
-
 % Multiply each side with $\homox_{i1}$ and we get
 %
 % \begin{align}
@@ -410,5 +408,19 @@ Then $\homow_i$ is in the null space of $\bA_i$, which we can get by solving SVD
 % \end{align}
 %
 % Where $\homox_{i1} = [x_{i1}, y_{i1}, 1]^T$ and $\ct_{11}, \ct_{12}, \ct_{13}$ are the first, the second, and the third row of the camera matrix $\camera_1$.
+
+\newpage
+
+\subsection{Q4.1}
+
+SOme detected correspondences are shown in Figure.~\ref{fig:q4.1}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.8\linewidth]{../results/q4_1.png}
+    \caption{Visualization of some detected correspondences. }
+    \label{fig:q4.1}
+\end{figure}
+
 
 \end{document}

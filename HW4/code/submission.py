@@ -8,69 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from helper import refineF, displayEpipolarF
 import sys
-
-def main():
-    print("Load the data")
-    im1 = plt.imread("../data/im1.png")
-    im2 = plt.imread("../data/im2.png")
-    data = np.load("../data/some_corresp.npz")
-    pts1 = data['pts1'].astype(float)
-    pts2 = data['pts2'].astype(float)
-
-    if sys.argv[1] == "2.1":
-        print("Test the eightpoint() algorithm")
-        M = max(*im1.shape[:2])
-        F = eightpoint(pts1, pts2, M)
-        print("fundamental matrix:")
-        print(F)
-        np.savez("../results/q2_1.npz", F=F, M=M)
-        displayEpipolarF(im1, im2, F)
-
-    elif sys.argv[1] == "2.2":
-        print("test the sevenpoint() algorithm")
-        F8p = np.load("../results/q2_1.npz")['F']
-        print(F8p)
-        M = max(*im1.shape[:2])
-
-        # Set up data for evaluating F
-        N = pts1.shape[0]
-        homo1 = np.hstack([pts1, np.ones((N,1))])
-        homo2 = np.hstack([pts2, np.ones((N,1))])
-
-        # Sample 7 correspondences randomly
-        # To expedite the searching process, I select F closest to that given by
-        # the eightpoint() algorithm.
-        best_F = None
-        best_error = 1e10
-        best_ind = None
-        best_pts = None
-        np.random.seed(2020)
-        for _ in range(200):
-            sample_ind = np.random.choice(np.arange(N), 7)
-            sample_pts1 = pts1[sample_ind]
-            sample_pts2 = pts2[sample_ind]
-            Farray = sevenpoint(sample_pts1, sample_pts2, M)
-            for F in Farray:
-                error = np.linalg.norm(F - F8p)
-                if error < best_error:
-                    best_F = F
-                    best_error = error
-                    best_ind = sample_ind
-                    best_pts = (sample_pts1, sample_pts2)
-        print("Best sample indices:", best_ind)
-        print("Best F from sampling with error:", best_error)
-        print(best_F)
-        np.savez("../results/q2_2.npz", F=best_F, M=M, pts1=best_pts[0], pts2=best_pts[1])
-
-        displayEpipolarF(im1, im2, best_F)
-
-    elif sys.argv[1] == "3.1":
-        print("Test essentialMatrix() function")
-        data = np.load("../data/intrinsics.npz")
-        K1, K2 = data["K1"], data["K2"]
-        F = np.load("../results/q2_1.npz")['F']
-        E = essentialMatrix(F, K1, K2)
-        print(E)
+import cv2
 
 '''
 Q2.1: Eight Point Algorithm
@@ -247,8 +185,72 @@ Q4.1: 3D visualization of the temple images.
 
 '''
 def epipolarCorrespondence(im1, im2, F, x1, y1):
+    # Convert RGB to gray scale for intensity
+    if im1.ndim > 2:
+        im1 = cv2.cvtColor(im1, cv2.COLOR_BGR2GRAY)
+        im2 = cv2.cvtColor(im2, cv2.COLOR_BGR2GRAY)
+    # normalize image
+    if im1.max() > 10:
+        im1 = im1.astype(float)/255.0
+        im2 = im2.astype(float)/255.0
+
     # Replace pass by your implementation
-    pass
+    # Get the parameter of the epipolar line in im 2
+    X1 = np.array([x1, y1, 1]).reshape((-1, 1))
+    l2 = F.dot(X1)
+
+    # function for cropping a patch on an image
+    patch_s = 3
+    patch_width = 2*patch_s+1
+    def cropPatch(im, x, y):
+        patch = im[y-patch_s:y+patch_s+1, x-patch_s:x+patch_s+1]
+        return patch
+
+    # Get the template patch
+    template = cropPatch(im1, x1, y1)
+
+    # Get the points on the epipolar line in image 2
+    h, w = im2.shape
+    # Get x from y
+    y2 = np.arange(patch_s, h-patch_s)
+    x2 = (-l2[1]*y2-l2[2]) / l2[0]
+    X2 = np.stack([x2, y2], axis=1).round().astype(int)
+    # Filter out out-of-image patch
+    X2 = X2[np.logical_and(x2>=patch_s, x2<w-patch_s)]
+
+    # Get y from x
+    x2 = np.arange(patch_s, w-patch_s)
+    y2 = (-l2[0]*x2-l2[2]) / l2[0]
+    XX2 = np.stack([x2, y2], axis=1).round().astype(int)
+    # Filter out out-of-image patch
+    XX2 = XX2[np.logical_and(y2>=patch_s, y2<h-patch_s)]
+
+    # some point may be missing if we only consider x from y
+    if XX2.shape[1] > X2.shape[1]:
+        X2 = XX2
+
+    # Only select the nearby patch
+    X2 = X2[((X2[:,0]-x1)**2 + (X2[:,1]-y1)**2) <= 15**2]
+
+    # Gaussian mask
+    def GaussianFilter(s=1, k=2):
+        #  generate a (2k+1)x(2k+1) gaussian kernel with mean=0 and sigma = s
+        probs = [np.exp(-z*z/(2*s*s))/np.sqrt(2*np.pi*s*s) for z in range(-k,k+1)]
+        kernel = np.outer(probs, probs)
+        return kernel
+    error_mask = GaussianFilter(s=1, k=patch_s)
+
+    # search over patches
+    best_error = 1e10
+    best_X = None
+    for (x, y) in X2:
+        p = cropPatch(im2, x, y)
+        error = np.linalg.norm((p - template)*error_mask, ord=2)
+        if error < best_error:
+            best_error = error
+            best_X = (x, y)
+
+    return best_X[0], best_X[1]
 
 '''
 Q5.1: RANSAC method.
@@ -309,6 +311,3 @@ Q5.3 Bundle adjustment.
 def bundleAdjustment(K1, M1, p1, K2, M2_init, p2, P_init):
     # Replace pass by your implementation
     pass
-
-if __name__ == '__main__':
-    main()
