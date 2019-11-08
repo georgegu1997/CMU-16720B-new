@@ -68,17 +68,17 @@ def main():
     P = best_P
     print("best_reproj_err:",best_reproj_err)
 
+    np.savez("../results/q4_2.npz", F=F, M1=M1, M2=M2, C1=C1, C2=C2)
+
+    # For 3D visualization
     from mpl_toolkits.mplot3d import Axes3D
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(P[:, 0], P[:, 1], P[:, 2], c='r', marker='o')
+    ax.scatter(P[:, 0], P[:, 1], P[:, 2], c='r', marker='o', s=3)
 
     ax.set_xlabel('X Label')
     ax.set_ylabel('Y Label')
     ax.set_zlabel('Z Label')
-    # ax.set_xlim([-10,10])
-    # ax.set_ylim([-5,5])
-    # ax.set_zlim([-10,10])
 
     plt.show()
 

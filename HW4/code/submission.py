@@ -186,10 +186,11 @@ Q4.1: 3D visualization of the temple images.
 
 '''
 def epipolarCorrespondence(im1, im2, F, x1, y1):
-    # Convert RGB to gray scale for intensity
-    if im1.ndim > 2:
-        im1 = cv2.cvtColor(im1, cv2.COLOR_BGR2GRAY)
-        im2 = cv2.cvtColor(im2, cv2.COLOR_BGR2GRAY)
+    # # Convert RGB to gray scale for intensity
+    # if im1.ndim > 2:
+    #     im1 = cv2.cvtColor(im1, cv2.COLOR_BGR2GRAY)
+    #     im2 = cv2.cvtColor(im2, cv2.COLOR_BGR2GRAY)
+
     # normalize image
     if im1.max() > 10:
         im1 = im1.astype(float)/255.0
@@ -201,7 +202,7 @@ def epipolarCorrespondence(im1, im2, F, x1, y1):
     l2 = F.dot(X1)
 
     # function for cropping a patch on an image
-    patch_s = 3
+    patch_s = 10
     patch_width = 2*patch_s+1
     def cropPatch(im, x, y):
         patch = im[y-patch_s:y+patch_s+1, x-patch_s:x+patch_s+1]
@@ -211,7 +212,7 @@ def epipolarCorrespondence(im1, im2, F, x1, y1):
     template = cropPatch(im1, x1, y1)
 
     # Get the points on the epipolar line in image 2
-    h, w = im2.shape
+    h, w = im2.shape[:2]
     # Get x from y
     y2 = np.arange(patch_s, h-patch_s)
     x2 = (-l2[1]*y2-l2[2]) / l2[0]
@@ -231,7 +232,7 @@ def epipolarCorrespondence(im1, im2, F, x1, y1):
         X2 = XX2
 
     # Only select the nearby patch
-    max_dist = 15
+    max_dist = 50
     X2 = X2[((X2[:,0]-x1)**2 + (X2[:,1]-y1)**2) <= max_dist**2]
 
     # Gaussian mask
@@ -241,14 +242,15 @@ def epipolarCorrespondence(im1, im2, F, x1, y1):
         probs = [np.exp(-z*z/(2*s*s))/np.sqrt(2*np.pi*s*s) for z in range(-k,k+1)]
         kernel = np.outer(probs, probs)
         return kernel
-    error_mask = GaussianFilter(s=1, k=patch_s)
+    error_mask = GaussianFilter(s=patch_s//2, k=patch_s)
+    error_mask = np.expand_dims(error_mask, axis=2)
 
     # search over patches
     best_error = 1e10
     best_X = None
     for (x, y) in X2:
         p = cropPatch(im2, x, y)
-        error = np.linalg.norm((p - template)*error_mask, ord=2)
+        error = (((p - template)*error_mask) ** 2).sum()
         if error < best_error:
             best_error = error
             best_X = (x, y)
