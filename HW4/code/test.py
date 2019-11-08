@@ -71,5 +71,13 @@ def main():
         np.savez("../results/q4_1.npz", F=F)
         epipolarMatchGUI(im1, im2, F)
 
+    elif sys.argv[1] == "5.1":
+        print("Test the ransacF() algorithm")
+        F_ransac, inliers = ransacF(pts1, pts2, M)
+        print(F_ransac)
+        print(inliers.shape)
+        # displayEpipolarF(im1, im2, F_ransac)
+
+
 if __name__ == '__main__':
     main()

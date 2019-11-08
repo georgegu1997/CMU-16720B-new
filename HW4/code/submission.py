@@ -267,7 +267,54 @@ Q5.1: RANSAC method.
 '''
 def ransacF(pts1, pts2, M):
     # Replace pass by your implementation
-    pass
+    N = pts1.shape[0]
+    print("Total numbe of points N:", N)
+    max_iter = 2000
+    inlier_threshold = 0.6
+
+    homo1 = np.hstack([pts1, np.ones((N, 1))]).T
+    homo2 = np.hstack([pts2, np.ones((N, 1))]).T
+
+    # run RANSAC process
+    best_F = None
+    best_score = -1
+    best_inliers = None
+    for i in range(max_iter):
+        # random sampling and fit model
+        indices = np.random.choice(np.arange(N), 7)
+        Farray = sevenpoint(pts1[indices], pts2[indices], M)
+
+        for F in Farray:
+            # Calculate error for each point
+            l2 = F.dot(homo1) # (3, N)
+            l1 = F.T.dot(homo2) # (3, N)
+
+            den2 = l2[0]**2 + l2[1]**2
+            den1 = l1[0]**2 + l1[1]**2
+
+            error = []
+            for j in range(N):
+                num = homo2[:, j:j+1].T.dot(F).dot(homo1[:, j:j+1])
+                num = num**2
+                e = num / den1[j] + num / den2[j]
+                error.append(e[0][0])
+
+            # decide inliers
+            error = np.array(error)
+            inliers = error < inlier_threshold
+            score = inliers.sum()
+            if score > best_score:
+                best_F = F
+                best_score = score
+                best_inliers = inliers
+
+    # Re-estimate the final F using all inliers of the best case
+    final_F = eightpoint(pts1[best_inliers], pts2[best_inliers], M)
+
+    # print(best_F)
+    print("best num inliers:", best_inliers.sum())
+
+    return final_F, best_inliers
 
 '''
 Q5.2: Rodrigues formula.

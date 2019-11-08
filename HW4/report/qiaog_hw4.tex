@@ -426,7 +426,7 @@ SOme detected correspondences are shown in Figure.~\ref{fig:q4.1}
 
 \subsection*{Q4.2}
 
-The recovered point could can be viewed in Figure.~\ref{fig:q4.1}. 
+The recovered point could can be viewed in Figure.~\ref{fig:q4.1}.
 
 \begin{figure}[h!]
     \begin{subfigure}{.49\textwidth}
@@ -452,5 +452,19 @@ The recovered point could can be viewed in Figure.~\ref{fig:q4.1}.
     \caption{Different views of the point cloud recovered from \code{templeCoords}. }
     \label{fig:q4.1}
 \end{figure}
+
+\newpage
+
+\subsection*{Q5.1}
+
+As suggested by the lecture notes: When the fundamental matrix is correct, the epipolar line induced by a point in the first image should pass through the matching point in the second image and vice-versa.
+Therefore, we used the distance of points to corresponding epipolar lines as the criterion in deciding inliers during RANSAC process. More specifically
+
+\begin{align}
+  Err(\homox_2, \fundamental, \homox_1) = dist^2(\homox_2, \fundamental \homox_1) + dist^2(\homox_1, \fundamental^T \homox_2),  \\
+  \textrm{where } dist(\homox_2, \fundamental \homox_1) = \frac{\homox_2^T \fundamental \homox_1}{\sqrt{l_1^2 + l_2^2}}, \fundamental \homox_1=[l_1, l_2, l_3]^T
+\end{align}
+
+And a correspondence is considered an inlier if its error is below a threshold $\epsilon$. To decide $\epsilon$, I tried different values and found that when $\epsilon=0.6$, the RANSAC yield around $110*0.75=82.5$ inliers, and thus decide the threshold to be 0.6.
 
 \end{document}
