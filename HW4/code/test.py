@@ -11,10 +11,10 @@ def main():
     data = np.load("../data/some_corresp.npz")
     pts1 = data['pts1'].astype(float)
     pts2 = data['pts2'].astype(float)
+    M = max(*im1.shape[:2])
 
     if sys.argv[1] == "2.1":
         print("Test the eightpoint() algorithm")
-        M = max(*im1.shape[:2])
         F = eightpoint(pts1, pts2, M)
         print("fundamental matrix:")
         print(F)
@@ -23,9 +23,8 @@ def main():
 
     elif sys.argv[1] == "2.2":
         print("test the sevenpoint() algorithm")
-        F8p = np.load("../results/q2_1.npz")['F']
+        F8p = eightpoint(pts1, pts2, M)
         print(F8p)
-        M = max(*im1.shape[:2])
 
         # Set up data for evaluating F
         N = pts1.shape[0]
@@ -63,12 +62,12 @@ def main():
         print("Test essentialMatrix() function")
         data = np.load("../data/intrinsics.npz")
         K1, K2 = data["K1"], data["K2"]
-        F = np.load("../results/q2_1.npz")['F']
+        F = eightpoint(pts1, pts2, M)
         E = essentialMatrix(F, K1, K2)
         print(E)
 
     elif sys.argv[1] == "4.1":
-        F = np.load("../results/q2_1.npz")['F']
+        F = eightpoint(pts1, pts2, M)
         np.savez("../results/q4_1.npz", F=F)
         epipolarMatchGUI(im1, im2, F)
 

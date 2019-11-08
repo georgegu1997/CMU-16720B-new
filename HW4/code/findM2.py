@@ -37,21 +37,26 @@ def test_M2_solution(pts1, pts2, intrinsics, M):
     # Solve 3D points using each possible transform and get the best one
     best_P = None
     best_err = 1e10
+    best_reproj_err = None
     best_M2 = None
     best_C2 = None
     for i in range(M2s.shape[2]):
         M2 = M2s[:,:,i]
         C2 = K2.dot(M2)
-        P, err = triangulate(C1, pts1, C2, pts2)
+        P, reproj_err = triangulate(C1, pts1, C2, pts2)
+        # Define the err to be the maximum distance in the points
+        # reasonable solution does not come from a smaller reprojection error
+        err = P[:, 0].max() - P[:, 0].min() + P[:, 1].max() - P[:, 1].min() + P[:, 2].max() - P[:, 2].min()
         if err < best_err:
             best_P = P
             best_err = err
+            best_reproj_err = reproj_err
             best_M2 = M2
             best_C2 = C2
     M2 = best_M2
     C2 = best_C2
     P = best_P
-    print("best_err:",best_err)
+    print("best_reproj_err:",best_reproj_err)
 
     return M2, C2, P
 

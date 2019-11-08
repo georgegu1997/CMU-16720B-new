@@ -165,6 +165,7 @@ def triangulate(C1, pts1, C2, pts2):
         x2_proj = x2_proj / x2_proj[-1]
         x1, x2 = pts1[i], pts2[i]
         this_err = np.linalg.norm(x1-x1_proj[:2])**2 + np.linalg.norm(x2-x2_proj[:2])**2
+        # this_err = np.linalg.norm(x1-x1_proj[:2]) + np.linalg.norm(x2-x2_proj[:2])
         # print(this_err)
         err += this_err
 
@@ -230,9 +231,11 @@ def epipolarCorrespondence(im1, im2, F, x1, y1):
         X2 = XX2
 
     # Only select the nearby patch
-    X2 = X2[((X2[:,0]-x1)**2 + (X2[:,1]-y1)**2) <= 15**2]
+    max_dist = 15
+    X2 = X2[((X2[:,0]-x1)**2 + (X2[:,1]-y1)**2) <= max_dist**2]
 
     # Gaussian mask
+    # https://stackoverflow.com/questions/17190649/how-to-obtain-a-gaussian-filter-in-python
     def GaussianFilter(s=1, k=2):
         #  generate a (2k+1)x(2k+1) gaussian kernel with mean=0 and sigma = s
         probs = [np.exp(-z*z/(2*s*s))/np.sqrt(2*np.pi*s*s) for z in range(-k,k+1)]
