@@ -465,6 +465,6 @@ Therefore, we used the distance of points to corresponding epipolar lines as the
   \textrm{where } dist(\homox_2, \fundamental \homox_1) = \frac{\homox_2^T \fundamental \homox_1}{\sqrt{l_1^2 + l_2^2}}, \fundamental \homox_1=[l_1, l_2, l_3]^T
 \end{align}
 
-And a correspondence is considered an inlier if its error is below a threshold $\epsilon$. To decide $\epsilon$, I tried different values and found that when $\epsilon=0.6$, the RANSAC yield around $110*0.75=82.5$ inliers, and thus decide the threshold to be 0.6.
+And a correspondence is considered an inlier if its error is below a threshold $\epsilon$. To decide $\epsilon$, I tried different values and found that when $\epsilon=0.7$, the RANSAC yield around $110*0.75=82.5$ inliers, and thus decide the threshold to be 0.7.
 
 \end{document}

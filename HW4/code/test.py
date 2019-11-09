@@ -73,10 +73,64 @@ def main():
 
     elif sys.argv[1] == "5.1":
         print("Test the ransacF() algorithm")
+        some_corresp_noisy = np.load("../data/some_corresp_noisy.npz")
+        pts1 = some_corresp_noisy['pts1'].astype(float)
+        pts2 = some_corresp_noisy['pts2'].astype(float)
         F_ransac, inliers = ransacF(pts1, pts2, M)
         print(F_ransac)
         print(inliers.shape)
         # displayEpipolarF(im1, im2, F_ransac)
+
+    elif sys.argv[1] == "5.3":
+        print("Test the rodriguesResidual()")
+        some_corresp_noisy = np.load("../data/some_corresp_noisy.npz")
+        pts1 = some_corresp_noisy['pts1'].astype(float)
+        pts2 = some_corresp_noisy['pts2'].astype(float)
+        intrinsics = np.load('../data/intrinsics.npz')
+        K1, K2 = intrinsics["K1"], intrinsics["K2"]
+        # estimate fundamental matrix using eightpoint or sevenpoint algorithm
+        F, inliers = ransacF(pts1, pts2, M)
+
+        # get essential matrix using fundamental and intrinsics
+        E = essentialMatrix(F, K1, K2)
+
+        # M1 is normalized
+        M1 = np.hstack([np.eye(3), np.zeros((3, 1))])
+        C1 = K1.dot(M1)
+        # get the rotation and translation from essential matrix
+        M2s = camera2(E)
+
+        # Solve 3D points using each possible transform and get the best one
+        best_P = None
+        best_err = 1e10
+        best_reproj_err = None
+        best_M2 = None
+        best_C2 = None
+        for i in range(M2s.shape[2]):
+            M2 = M2s[:,:,i]
+            C2 = K2.dot(M2)
+            P, reproj_err = triangulate(C1, pts1, C2, pts2)
+            # Define the err to be the maximum distance in the points
+            # reasonable solution does not come from a smaller reprojection error
+            err = P[:, 0].max() - P[:, 0].min() + P[:, 1].max() - P[:, 1].min() + P[:, 2].max() - P[:, 2].min()
+            if err < best_err:
+                best_P = P
+                best_err = err
+                best_reproj_err = reproj_err
+                best_M2 = M2
+                best_C2 = C2
+        M2 = best_M2
+        C2 = best_C2
+        P = best_P
+
+        R2 = M2[:, :3]
+        t2 = M1[:, 3]
+        r2 = invRodrigues(R2)
+
+        x = np.concatenate([P.reshape(-1), r2.reshape(-1), t2])
+        residuals = rodriguesResidual(K1, M1, pts1, K2, pts2, x)
+        print(residuals.shape)
+        print(np.linalg.norm(residuals)**2)
 
 
 if __name__ == '__main__':

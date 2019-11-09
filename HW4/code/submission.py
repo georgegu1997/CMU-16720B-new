@@ -270,7 +270,7 @@ def ransacF(pts1, pts2, M):
     N = pts1.shape[0]
     print("Total numbe of points N:", N)
     max_iter = 2000
-    inlier_threshold = 0.6
+    inlier_threshold = 0.7
 
     homo1 = np.hstack([pts1, np.ones((N, 1))]).T
     homo2 = np.hstack([pts2, np.ones((N, 1))]).T
@@ -317,13 +317,43 @@ def ransacF(pts1, pts2, M):
     return final_F, best_inliers
 
 '''
+Given a 3d vector, return the 3X3 u_\times matrix
+'''
+def crossMatrix(u):
+    u = u.reshape(-1)
+    cross = np.array([
+        [0, -u[2], u[1]],
+        [u[2], 0, -u[0]],
+        [-u[1], u[0], 0]
+    ])
+    return cross
+
+'''
 Q5.2: Rodrigues formula.
     Input:  r, a 3x1 vector
     Output: R, a rotation matrix
 '''
 def rodrigues(r):
+    r = r.reshape(-1)
     # Replace pass by your implementation
-    pass
+    if r[0] == 0 and r[1] == 0 and r[2] == 0:
+        R =  np.eye(3)
+    else:
+        theta = ((r**2).sum()) ** (1/2.0)
+        u = r / theta
+        u = u.reshape((3, 1))
+        R = np.eye(3)*np.cos(theta) + (1-np.cos(theta))*u.dot(u.T) + crossMatrix(u)*np.sin(theta)
+    return R
+
+def arctan2(s, c):
+    if c>0:
+        return np.arctan(s/c)
+    if c<0:
+        return np.pi+np.arctan(s/c)
+    if c==0 and s>0:
+        return np.pi/2
+    if c==0 and s<0:
+        return -np.pi/2
 
 '''
 Q5.2: Inverse Rodrigues formula.
@@ -332,7 +362,31 @@ Q5.2: Inverse Rodrigues formula.
 '''
 def invRodrigues(R):
     # Replace pass by your implementation
-    pass
+    A = (R - R.T) / 2
+    rho = np.array([A[2,1], A[0,2], A[1,0]]).reshape((-1,1))
+    s = np.linalg.norm(rho)
+    c = (R[0,0]+R[1,1]+R[2,2]-1)/2
+    if s == 0 and c == 1:
+        r = np.zeros((3, 1))
+        return r
+    if s == 0 and c == -1:
+        # Get the non zero column of (R+I)
+        for i in range(3):
+            v = (R+np.eye(3))[:, i]
+            if np.linalg.norm(v) > 0:
+                break
+        u = v / np.linalg.norm(v)
+        r = u * np.pi
+        # ensure uniqueness
+        if (r[0]==0 and r[1]==0 and r[2]<0) or (r[0]==0 and r[1]<0) or r[0]<0:
+            return -r
+        else:
+            return r
+
+    u = rho/s
+    theta = arctan2(s, c)
+    r = u*theta
+    return r
 
 '''
 Q5.3: Rodrigues residual.
@@ -346,7 +400,32 @@ Q5.3: Rodrigues residual.
 '''
 def rodriguesResidual(K1, M1, p1, K2, p2, x):
     # Replace pass by your implementation
-    pass
+    # Get the information from input x
+    N = int((x.shape[0]-6) / 3)
+    t2 = (x[-3:]).reshape((3,1))
+    r2 = x[-6:-3].reshape((3,1))
+    w = x[:-6].reshape((N, 3))
+
+    # Get the camera matrix
+    C1 = K1.dot(M1)
+    R2 = rodrigues(r2)
+    M2 = np.hstack([R2, t2])
+    C2 = K2.dot(M2)
+
+    # project the points
+    w_homo = np.hstack([w, np.ones((N, 1))]).T
+    p1_hat = C1.dot(w_homo)
+    p2_hat = C2.dot(w_homo)
+    p1_hat = p1_hat / p1_hat[2:, :]
+    p2_hat = p2_hat / p2_hat[2:, :]
+    p1_hat = p1_hat[:2].T
+    p2_hat = p2_hat[:2].T
+
+    # Calculate the residuals vector
+    residuals = np.concatenate([(p1-p1_hat).reshape([-1]), (p2-p2_hat).reshape([-1])])
+    residuals = residuals.reshape((-1,1))
+
+    return residuals
 
 '''
 Q5.3 Bundle adjustment.
