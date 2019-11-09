@@ -467,4 +467,31 @@ Therefore, we used the distance of points to corresponding epipolar lines as the
 
 And a correspondence is considered an inlier if its error is below a threshold $\epsilon$. To decide $\epsilon$, I tried different values and found that when $\epsilon=2$, the RANSAC yield around $140*0.75=105$ inliers, and thus decide the threshold to be 2.
 
+\newpage
+
+\subsection*{Q5.3}
+
+The images showing the 3D points before and after bundle adjustment are shown in Figure.~\ref{fig:q5.3}. And in my experiement, the reprojection error before the bundle adjustment is $386.57$ and the error after the bundle adjustment is $8.93$.
+
+\begin{figure}[h!]
+    \begin{subfigure}{\textwidth}
+      \centering
+      \includegraphics[width=.8\linewidth]{../results/q5_3_1.png}
+      \caption{view 1}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+      \centering
+      \includegraphics[width=.8\linewidth]{../results/q5_3_2.png}
+      \caption{view 2}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+      \centering
+      \includegraphics[width=.8\linewidth]{../results/q5_3_3.png}
+      \caption{view 3}
+    \end{subfigure}
+    \caption{Different views of the point cloud before and after the bundle adjustment. }
+    \label{fig:q5.3}
+\end{figure}
+
+
 \end{document}

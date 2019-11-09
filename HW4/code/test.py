@@ -99,6 +99,7 @@ def main():
 
     elif sys.argv[1] == "5.3":
         print("Test the rodriguesResidual()")
+        np.random.seed(2019)
         some_corresp_noisy = np.load("../data/some_corresp_noisy.npz")
         pts1 = some_corresp_noisy['pts1'].astype(float)
         pts2 = some_corresp_noisy['pts2'].astype(float)
@@ -142,16 +143,39 @@ def main():
         C2 = best_C2
         P = best_P
 
-        R2 = M2[:, :3]
-        t2 = M2[:, 3]
-        r2 = invRodrigues(R2)
-
-        x = np.concatenate([P.reshape(-1), r2.reshape(-1), t2])
+        # Error before bundleAdjustment
+        x = composeX(M2, P)
         residuals = rodriguesResidual(K1, M1, pts1, K2, pts2, x)
-        # print((residuals**2).reshape((-1, 2)))
-        print(residuals.shape)
-        print(np.linalg.norm(residuals)**2)
+        print("Error before bundleAdjustment:", np.linalg.norm(residuals)**2)
 
+        # bundleAdjustment
+        M2_ba, P_ba = bundleAdjustment(K1, M1, pts1, K2, M2, pts2, P)
+
+        # Error after bundleAdjustment
+        x_ba = composeX(M2_ba, P_ba)
+        residuals_ba = rodriguesResidual(K1, M1, pts1, K2, pts2, x_ba)
+        print("Error after bundleAdjustment:", np.linalg.norm(residuals_ba)**2)
+
+        # For 3D visualization
+        from mpl_toolkits.mplot3d import Axes3D
+        fig = plt.figure(figsize=(16, 8))
+        ax1 = fig.add_subplot(121, projection='3d')
+        ax1.set_title("initial estimation")
+        ax1.scatter(P[:, 0], P[:, 1], P[:, 2], c='r', marker='o', s=9)
+
+        ax1.set_xlabel('X Label')
+        ax1.set_ylabel('Y Label')
+        ax1.set_zlabel('Z Label')
+
+        ax2 = fig.add_subplot(122, projection='3d')
+        ax2.set_title("after bundle adjustment")
+        ax2.scatter(P_ba[:, 0], P_ba[:, 1], P_ba[:, 2], c='r', marker='o', s=9)
+
+        ax2.set_xlabel('X Label')
+        ax2.set_ylabel('Y Label')
+        ax2.set_zlabel('Z Label')
+
+        plt.show()
 
 if __name__ == '__main__':
     main()

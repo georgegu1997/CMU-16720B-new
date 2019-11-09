@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from helper import refineF, displayEpipolarF
 import sys
 import cv2
+import scipy
 
 '''
 Q2.1: Eight Point Algorithm
@@ -402,14 +403,10 @@ def rodriguesResidual(K1, M1, p1, K2, p2, x):
     # Replace pass by your implementation
     # Get the information from input x
     N = int((x.shape[0]-6) / 3)
-    t2 = (x[-3:]).reshape((3,1))
-    r2 = x[-6:-3].reshape((3,1))
-    w = x[:-6].reshape((N, 3))
 
     # Get the camera matrix
+    M2, w = decomposeX(x)
     C1 = K1.dot(M1)
-    R2 = rodrigues(r2)
-    M2 = np.hstack([R2, t2])
     C2 = K2.dot(M2)
 
     # project the points
@@ -428,6 +425,25 @@ def rodriguesResidual(K1, M1, p1, K2, p2, x):
     return residuals
 
 '''
+Take in a (3, 4) transform M and 3D point in (N, 3)
+Return the concatenation of (P, r, t) as (3N+6, 1)
+'''
+def composeX(M, P):
+    R = M[:, :3]
+    r = invRodrigues(R)
+    t = M[:, 3]
+    x = np.concatenate([P.reshape(-1), r.reshape(-1), t])
+    return x
+
+def decomposeX(x):
+    t = (x[-3:]).reshape((3,1))
+    r = x[-6:-3].reshape((3,1))
+    R = rodrigues(r)
+    M = np.hstack([R, t])
+    P = x[:-6].reshape((-1, 3))
+    return M, P
+
+'''
 Q5.3 Bundle adjustment.
     Input:  K1, the intrinsics of camera 1
             M1, the extrinsics of camera 1
@@ -441,4 +457,9 @@ Q5.3 Bundle adjustment.
 '''
 def bundleAdjustment(K1, M1, p1, K2, M2_init, p2, P_init):
     # Replace pass by your implementation
-    pass
+    x0 = composeX(M2_init, P_init)
+    f = lambda x: rodriguesResidual(K1, M1, p1, K2, p2, x).reshape(-1)
+    res = scipy.optimize.leastsq(f, x0)
+    M2_final, P_final = decomposeX(res[0])
+
+    return M2_final, P_final
