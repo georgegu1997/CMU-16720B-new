@@ -268,9 +268,9 @@ Q5.1: RANSAC method.
 def ransacF(pts1, pts2, M):
     # Replace pass by your implementation
     N = pts1.shape[0]
-    print("Total numbe of points N:", N)
+    print("Total number of points N:", N)
     max_iter = 2000
-    inlier_threshold = 0.7
+    inlier_threshold = 2.0
 
     homo1 = np.hstack([pts1, np.ones((N, 1))]).T
     homo2 = np.hstack([pts2, np.ones((N, 1))]).T

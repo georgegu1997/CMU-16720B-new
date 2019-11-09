@@ -81,6 +81,22 @@ def main():
         print(inliers.shape)
         # displayEpipolarF(im1, im2, F_ransac)
 
+    elif sys.argv[1] == "5.2":
+        print("Test rodrigues() and invRodrigues()")
+        from scipy.stats import special_ortho_group
+        for i in range(10):
+            # Generate a random R
+            R = special_ortho_group.rvs(3)
+            r = invRodrigues(R)
+            R_recon = rodrigues(r)
+            print(np.linalg.norm(R-R_recon))
+        for i in range(10):
+            # Generate a random r
+            r = np.random.rand(3,1)
+            R = rodrigues(r)
+            r_recon = invRodrigues(R)
+            print(np.linalg.norm(r-r_recon))
+
     elif sys.argv[1] == "5.3":
         print("Test the rodriguesResidual()")
         some_corresp_noisy = np.load("../data/some_corresp_noisy.npz")
@@ -88,8 +104,11 @@ def main():
         pts2 = some_corresp_noisy['pts2'].astype(float)
         intrinsics = np.load('../data/intrinsics.npz')
         K1, K2 = intrinsics["K1"], intrinsics["K2"]
-        # estimate fundamental matrix using eightpoint or sevenpoint algorithm
+        # estimate fundamental matrix
         F, inliers = ransacF(pts1, pts2, M)
+
+        # Get only inliers for the following steps
+        pts1, pts2 = pts1[inliers], pts2[inliers]
 
         # get essential matrix using fundamental and intrinsics
         E = essentialMatrix(F, K1, K2)
@@ -124,11 +143,12 @@ def main():
         P = best_P
 
         R2 = M2[:, :3]
-        t2 = M1[:, 3]
+        t2 = M2[:, 3]
         r2 = invRodrigues(R2)
 
         x = np.concatenate([P.reshape(-1), r2.reshape(-1), t2])
         residuals = rodriguesResidual(K1, M1, pts1, K2, pts2, x)
+        # print((residuals**2).reshape((-1, 2)))
         print(residuals.shape)
         print(np.linalg.norm(residuals)**2)
 
