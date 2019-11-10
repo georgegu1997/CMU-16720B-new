@@ -1,0 +1,108 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\topmargin -.5in
+\textheight 9in
+\oddsidemargin -.25in
+\evensidemargin -.25in
+\textwidth 7in
+
+\newcommand{\code}[1]{\texttt{#1}}
+
+\begin{document}
+
+\author{Gu, Qiao}
+\title{16-720B Homework 4 Write-up}
+\maketitle
+
+\medskip
+
+\subsection*{Q1.1}
+
+The given translation is applied to all $x_j$ for $j\in \mathbb{R}$. Then for each $x_ii$
+
+\begin{align}
+  softmax(x_i+c) = \frac{e^{x_i+c}}{\sum_j e^{x_j+c}} = \frac{e^{x_i}e^c}{\sum_j e^{x_j}e^c}
+  = \frac{e^{x_i}e^c}{(\sum_j e^{x_j})e^c} = \frac{e^{x_i}}{\sum_j e^{x_j}} = softmax(x_i).
+\end{align}
+
+This shows that softmax is invariant to translation.
+
+When $c=-\max x_i$, all $x_i+c$ is between zero and one, and the difference between $e^{x_I}$ is relatively small. And when $c=0$, $e^{x_i}$ can be exponentially large and may cause numerical instability.
+
+\newpage
+
+\subsection*{Q1.2}
+
+\begin{itemize}
+  \item Each element of softmax $softmax(x_i)$ is in range $(0,1)$, and the sum over all elements is $\sum_j softmax(x_j) = 1$.
+  \item Probability.
+  \item $s_i=e^{x_i}$ is to map each $x_i$ to its probability weight. $S=\sum s_i$ is find the sum of the weights. $softmax(x_I) = \frac{1}{S} x_i$ is to normalize each weight by all weights to get probability.
+\end{itemize}
+
+\newpage
+
+\subsection*{Q1.3}
+
+\newcommand{\bx} {\mathbf{x}}
+\newcommand{\by} {\mathbf{y}}
+\newcommand{\bW} {\mathbf{W}}
+\newcommand{\bb} {\mathbf{b}}
+
+Each layer of a neural network can be written mathmatically as $f_i(\bx)=\bW_i\bx+\bb$, and thus is we concatenate $n$ layers together without non-linear layers, we get the output as
+
+\begin{align}
+  \by &= f_n(f_{n-1}(\cdots f_1(\bx) \cdots)) \\
+  &= \bW_n (\bW_{n-1} (\cdots(\bW_1\bx+\bb_1)\cdots) +\bb_{n-1}) + \bb_n \\
+  &= \bW_n \bW_{n-1}\cdots \bW_1 \bx + \bW_n \bW_{n-1}\cdots \bW_2 \bb_1 + \bW_n \bW_{n-1}\cdots \bW_3 \bb_2 + \cdots + \bW_n\bb_{n-1} + \bb_n\\
+  &= \bW\bx+b,
+\end{align}
+
+where $\bW = \bW_n \bW_{n-1}\cdots \bW_1$ and $\bb = \bW_n \bW_{n-1}\cdots \bW_2 \bb_1 + \bW_n \bW_{n-1}\cdots \bW_3 \bb_2 + \cdots + \bW_n\bb_{n-1} + \bb_n$. This can be regarded as a single linear layer, and the whole network is equivalent to linear regression.
+
+\newpage
+
+\subsection*{Q1.4}
+
+\begin{align}
+  \frac{d\sigma(x)}{dx} &= \frac{d}{dx}\frac{1}{1+e^{-x}} \\
+  &= (-1)\frac{1}{(1+e^{-x})^2} \frac{d}{dx} (1+e^{-x}) \\
+  &= (-1)\frac{1}{(1+e^{-x})^2} (-e^{-x}) \\
+  &= \frac{1+e^{-x}-1}{(1+e^{-x})^2} \\
+  &- \frac{1}{1+e^{-x}} - \frac{1}{(1+e^{-x})^2} \\
+  &= \frac{1}{1+e^{-x}} (1-\frac{1}{1+e^{-x}}) \\
+  &= \sigma(x) (1-\sigma(x))
+\end{align}
+
+\newpage
+\subsection*{Q1.5}
+
+\newcommand{\bdelta} {\mathbf{\delta}}
+
+The loss function is unknown and therefore we assume $\frac{\partial J}{\partial y_i} = \delta_i$. Therefore
+
+\begin{align}
+  \frac{\partial J}{\partial W_{ij}} &= \frac{\partial J}{\partial y_i} \frac{\partial y_i}{\partial W_{ij}} = \delta_i x_j \\
+  \frac{\partial J}{\partial x_j} &= \sum_{i=0}^k \frac{\partial J}{\partial y_i}\frac{\partial y_i}{\partial x_j} = \delta_i \sum_{i=0}^k W_{ij} \\
+  \frac{\partial J}{\partial b_i} &= \frac{\partial J}{\partial y_i} \frac{\partial y_i}{\partial b_i} = \delta_i
+\end{align}
+
+And then we can further rewrite it to matrix form
+
+\begin{align}
+  \frac{\partial J}{\partial\bW} &= \bdelta \bx^T \\
+  \frac{\partial J}{\partial\bx} &= \bW^T \bdelta \\
+  \frac{\partial J}{\partial\bb} &= \bdelta
+\end{align}
+
+\newpage
+
+\subsection*{Q1.6}
+
+
+\end{document}
