@@ -29,27 +29,27 @@
 \newcommand{\essential}{\mathbf{E}}
 \newcommand{\homox}{\tilde{\mathbf{x}}}
 
-Consider the point $\mathbf{w}$ where the principle axes of the two cameras intersect, and we can see that $\homox_1=[0,0,1]^T$ and $\homox_2=[0,0,1]^T$ corresponding one point in 3D. Therefore
+Consider that the point $\mathbf{w}$ is the point in 3D where the principle axes of the two cameras intersect, and we can see that $\homox_1=[0,0,1]^T$ and $\homox_2=[0,0,1]^T$ are its projections in camera 1 and camera 2 respectively. Therefore
 
 \begin{align}
-    \homox_2^T \essential \homox_1 =
+    \homox_2^T \fundamental \homox_1 =
     \begin{bmatrix}
         0 & 0 & 1
     \end{bmatrix}
     \begin{bmatrix}
-        \essential_{11} & \essential_{12} & \essential_{13} \\
-        \essential_{21} & \essential_{22} & \essential_{23} \\
-        \essential_{31} & \essential_{32} & \essential_{33}
+        \fundamental_{11} & \fundamental_{12} & \fundamental_{13} \\
+        \fundamental_{21} & \fundamental_{22} & \fundamental_{23} \\
+        \fundamental_{31} & \fundamental_{32} & \fundamental_{33}
     \end{bmatrix}
     \begin{bmatrix}
         0 \\ 0 \\ 1
     \end{bmatrix}
-    = \essential_{33} = 0
+    = \fundamental_{33} = 0
 \end{align}
 
-Since two cameras are normalized, the intrinsic matrices for them are identity:  $\intrinsic_1=\intrinsic_2=\mathbf{I}$.
-Then $\essential = \intrinsic_1^T \fundamental \intrinsic_2 = \essential$.
-Therefore, $\essential_{33} = \fundamental_{33}=0$.
+% Since two cameras are normalized, the intrinsic matrices for them are identity:  $\intrinsic_1=\intrinsic_2=\mathbf{I}$.
+% Then $\essential = \intrinsic_1^T \fundamental \intrinsic_2 = \essential$.
+% Therefore, $\essential_{33} = \fundamental_{33}=0$.
 
 % Suppose the intrinsic matrix for two cameras are
 %
@@ -113,9 +113,9 @@ Therefore, $\essential_{33} = \fundamental_{33}=0$.
 \newcommand {\translation} {\mathbf{t}}
 \newcommand {\bl} {\mathbf{l}}
 
-Suppose the cameras are normalized in the sense that their intrinsic matrices are both identity:  $\intrinsic_1=\intrinsic_2=\mathbf{I}$.
+% Suppose the cameras are normalized in the sense that their intrinsic matrices are both identity:  $\intrinsic_1=\intrinsic_2=\mathbf{I}$.
 
-Now that the translation and rotation from camera 1 to camera 2 are
+The translation and rotation from camera 1 to camera 2 are
 
 \begin{align}
     \rotation =
@@ -159,7 +159,7 @@ Therefore for an epipolar line in camera 1 $\bl_1^T \homox_1=0$ and $\homox_2^T 
   \end{bmatrix}
 \end{align}
 
-Similarly we can see that any epipolar line in camera 1 has $\bl_2^T = [0 \; -t_x \; t_xy_1]$. Since the first elements in both $\bl_1$ and $\bl_2$ are zero, the epipolar lines are parallel to $x$ axis.
+Similarly we can see that any epipolar line in camera 1 has $\bl_2^T = [0, \; -t_x, \; t_xy_1]$. Since the first elements in both $\bl_1$ and $\bl_2$ are zero, the epipolar lines are parallel to $x$ axis.
 
 % According to the dfinition of essential matrix
 %
@@ -246,9 +246,9 @@ Then the essential and fundamental matrix can be derived as
 \newcommand {\bI} {\mathbf{I}}
 \newcommand {\bw} {\mathbf{w}}
 
-Suppose the mirror is orthogonal to a unit vector $\bv$ pointing in to the mirror, then we can have the Householder transformation matrix $\bH=\bI - 2\bv\bv^T$. Suppose the real world coordinate has its origin at a point on the mirror, then for any point $\bw$ in the world coordinate, the mirror produce its reflection $\bw_2=\bH\bw_1=\bw_1 - 2\bv\bv^T\bw_1=\bw_1 + 2\alpha\bv$, where $\alpha=-\bv^T\bw_1$ is the dixed distance from $\bw_2$ to the mirror.
+Suppose the real world coordinate has its origin at the optical center of the camera and the mirror is orthogonal to a unit vector $\bv$ pointing in to the mirror. Then for any point $\bw$ in the world coordinate, the mirror produce its reflection $\bw_2=\bw_1 + 2\alpha\bv$, where is the dixed distance from $\bw_1$ to the mirror.
 
-This two points in 3D produce two point on the image plane as follows
+These two points in 3D produce two point on the image plane as follows
 
 \begin{align}
   \lambda_1\homox_1 &= \bw_1 \\
@@ -261,7 +261,7 @@ This is equivalent to a two-camera system where $\rotation=\bI$ and $\translatio
   \essential = \translation_\times \rotation = 2\alpha\bv_\times \bI=2\alpha\bv_\times
 \end{align}
 
-is skew-symmetric. Since there are only one camera with only one intrinsic $\intrinsic$, for fundamental matrix
+is skew-symmetric as $\bv_\times$ is skew-symmetric. Since there are only one camera with only one intrinsic $\intrinsic$, for fundamental matrix
 
 \begin{align}
   \fundamental = (\intrinsic^{-1})^T \essential \essential^{-1}
@@ -413,7 +413,7 @@ Then $\homow_i$ is in the null space of $\bA_i$, which we can get by solving SVD
 
 \subsection*{Q4.1}
 
-SOme detected correspondences are shown in Figure.~\ref{fig:q4.1}
+Some detected correspondences are shown in Figure.~\ref{fig:q4.1}
 
 \begin{figure}[h!]
     \centering
@@ -426,7 +426,7 @@ SOme detected correspondences are shown in Figure.~\ref{fig:q4.1}
 
 \subsection*{Q4.2}
 
-The recovered point could can be viewed in Figure.~\ref{fig:q4.1}.
+The recovered point could can be viewed in Figure.~\ref{fig:q4.2}.
 
 \begin{figure}[h!]
     \begin{subfigure}{.49\textwidth}
@@ -450,7 +450,7 @@ The recovered point could can be viewed in Figure.~\ref{fig:q4.1}.
       \caption{view 4}
     \end{subfigure}\hfill
     \caption{Different views of the point cloud recovered from \code{templeCoords}. }
-    \label{fig:q4.1}
+    \label{fig:q4.2}
 \end{figure}
 
 \newpage

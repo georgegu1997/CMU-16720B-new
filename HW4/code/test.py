@@ -79,7 +79,7 @@ def main():
         F_ransac, inliers = ransacF(pts1, pts2, M)
         print(F_ransac)
         print(inliers.shape)
-        # displayEpipolarF(im1, im2, F_ransac)
+        displayEpipolarF(im1, im2, F_ransac)
 
     elif sys.argv[1] == "5.2":
         print("Test rodrigues() and invRodrigues()")

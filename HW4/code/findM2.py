@@ -86,4 +86,4 @@ if __name__ == '__main__':
     #
     # plt.show()
 
-    np.savez('q3_3', M2=M2, C2=C2, P=P)
+    np.savez('../results/q3_3.npz', M2=M2, C2=C2, P=P)
