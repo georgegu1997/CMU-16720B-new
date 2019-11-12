@@ -104,5 +104,45 @@ And then we can further rewrite it to matrix form
 
 \subsection*{Q1.6}
 
+\begin{enumerate}
+    \item As shown in Figure.~\ref{fig:q1.6.1}, when the input to the sigmoid $x$ is far away from zero, the magnitude of the gradient becomes very close to zero and thus the gradient from higher layers are scaled by a very small number, even "vanishing". Therefore, when we update the network weights, the changes will be very small.
+    \item The output range of sigmoid function is $(0,1)$ and the output range of $tanh(x)$ is $(-1,1)$. If our input data are centered at 0, the output given by $\tanh$ are also centered at 0, which will make the input to different layers consistent.
+    \item From Figure.~\ref{fig:q1.6.1}, we can see that $\tanh(x)$ has a stronger gradient (larger magnitude) than $\sigma(x)$ does.
+    \item $\tanh(x)=2\sigma(2x)-1$ as
+    \begin{align}
+    \begin{split}
+        \sigma(x) = \frac{1}{1+e^{-x}}
+        &\Rightarrow \sigma(2x) = \frac{1}{1+e^{-2x}}
+        \Rightarrow 2\sigma(2x) = \frac{2}{1+e^{-2x}} \\
+        &\Rightarrow 2\sigma(2x)-1 = \frac{2-1-e^{-2x}}{1+e^{-2x}} = \frac{1-e^{-2x}}{1+e^{-2x}} = \tanh(x)
+    \end{split}
+    \end{align}
+\end{enumerate}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.6\linewidth]{../results/q1_6_1.png}
+    \caption{The plot of sigmoid function $\sigma(x)$ (in blue), its gradient $(1-\sigma(x))\sigma(x)$ (in red), the $\tanh(x)$ function (in green) and its gradient $1-\tanh^2(x)$ (in orange). }
+    \label{fig:q1.6.1}
+\end{figure}
+
+\newpage
+
+\subsection{Q2.1.1}
+
+If the weights and biases of every layer are initialized with zeros, the outpuut layer pre-activation values will be zeros regardless the input data and the post-activation values will be a uniform probability distribution.
+In this case, there will still be gradients in the network due to the softmax loss, but they will be very small. Therefore the update of the network is very slow, the training process may terminate without convergence or the network may be stuck at local optima.
+% Therefore The gradients of the network therefore will be zeros during training and the network weights will remain zeros after training.
+
+
+
+
+
+% \begin{figure}
+%     \center
+%     \includegraphics[width=.8\linewith]{../results/q1_6_1.png}
+%     \caption{}
+%     \label{}
+% \end{figure}
 
 \end{document}

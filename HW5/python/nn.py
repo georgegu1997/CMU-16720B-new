@@ -6,13 +6,15 @@ from util import *
 ############################## Q 2.1 ##############################
 # initialize b to 0 vector
 # b should be a 1D array, not a 2D array with a singleton dimension
-# we will do XW + b. 
+# we will do XW + b.
 # X be [Examples, Dimensions]
 def initialize_weights(in_size,out_size,params,name=''):
     W, b = None, None
 
     ##########################
     ##### your code here #####
+    W = np.random.uniform(-np.sqrt(6)/np.sqrt(in_size+out_size), np.sqrt(6)/np.sqrt(in_size+out_size), size=(in_size, out_size))
+    b = np.zeros(out_size)
     ##########################
 
     params['W' + name] = W
@@ -81,7 +83,7 @@ def compute_loss_and_acc(y, probs):
     ##### your code here #####
     ##########################
 
-    return loss, acc 
+    return loss, acc
 
 ############################## Q 2.3 ##############################
 # we give this to you
