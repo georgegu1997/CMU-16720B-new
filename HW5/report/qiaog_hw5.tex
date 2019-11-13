@@ -128,12 +128,19 @@ And then we can further rewrite it to matrix form
 
 \newpage
 
-\subsection{Q2.1.1}
+\subsection*{Q2.1.1}
 
 If the weights and biases of every layer are initialized with zeros, the outpuut layer pre-activation values will be zeros regardless the input data and the post-activation values will be a uniform probability distribution.
 In this case, there will still be gradients in the network due to the softmax loss, but they will be very small. Therefore the update of the network is very slow, the training process may terminate without convergence or the network may be stuck at local optima.
 % Therefore The gradients of the network therefore will be zeros during training and the network weights will remain zeros after training.
 
+\newpage
+
+\subsection*{Q2.1.3}
+
+Because if we initialize all the weights with the same number, some of them will have the same effect on the output values, and the gradients on them will be the same during backpropagation. Therefore, they will move together and hard to converge during training.
+
+Because in one layer of neural net $\by=\bW\bx+\bb$, the variance of the output $\by$ depends on both the variance of input $\bx$ and variance of elements of the weight $\bW$. This is also true during the backpropagation of gradients. Therefore we scale the weight variance down by the layer size, To make the output variance of each layer equal to the input variance.
 
 
 
