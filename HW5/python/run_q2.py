@@ -90,6 +90,7 @@ print([_[0].shape[0] for _ in batches])
 batch_num = len(batches)
 
 # WRITE A TRAINING LOOP HERE
+print("Q2.4.1 training loop")
 max_iters = 500
 learning_rate = 1e-3
 # with default settings, you should get loss < 35 and accuracy > 75%
@@ -97,30 +98,72 @@ for itr in range(max_iters):
     total_loss = 0
     avg_acc = 0
     for xb,yb in batches:
-        pass
-        # forward
-
-        # loss
-        # be sure to add loss and accuracy to epoch totals
-
-        # backward
-
-        # apply gradient
-
         ##########################
         ##### your code here #####
-        ##########################
+        # forward
+        h1 = forward(xb,params,'layer1') # First layer
+        probs = forward(h1,params,'output',softmax) # Second layer
+        # loss
+        loss, acc = compute_loss_and_acc(yb, probs)
+        # be sure to add loss and accuracy to epoch totals
+        total_loss += loss
+        avg_acc += acc / batch_num
 
+        # backward
+        delta1 = probs.copy()
+        delta1[np.arange(probs.shape[0]),yb.argmax(axis=1)] -= 1
+        delta2 = backwards(delta1,params,'output',linear_deriv)
+        backwards(delta2,params,'layer1',sigmoid_deriv)
+
+        # apply gradient
+        for k,v in sorted(list(params.items())):
+            if 'grad' in k:
+                name = k.split('_')[1]
+                # print(np.linalg.norm(learning_rate * v))
+                params[name] -= learning_rate * v
+        ##########################
 
     if itr % 100 == 0:
         print("itr: {:02d} \t loss: {:.2f} \t acc : {:.2f}".format(itr,total_loss,avg_acc))
-
 
 # Q 2.5 should be implemented in this file
 # you can do this before or after training the network.
 
 ##########################
 ##### your code here #####
+''' Do one more forward/backward since the last gradient descent
+    (params were modified since the last time of gradient calculated)
+'''
+# forward
+h1 = forward(x,params,'layer1') # First layer
+probs = forward(h1,params,'output',softmax) # Second layer
+loss, acc = compute_loss_and_acc(y, probs) # loss
+print("Final itr: \t loss: {:.2f} \t acc : {:.2f}".format(loss,acc))
+
+# backward
+delta1 = probs.copy()
+delta1[np.arange(probs.shape[0]),y.argmax(axis=1)] -= 1
+delta2 = backwards(delta1,params,'output',linear_deriv)
+backwards(delta2,params,'layer1',sigmoid_deriv)
+
+def numericalGradient(f, W0, eps):
+    W_shape = W0.shape
+    grad = np.zeros(W_shape)
+    grad = grad.reshape(-1)
+    W0 = W0.reshape(-1)
+    for i in range(W0.shape[0]):
+        Wplus = W0.copy()
+        Wminus = W0.copy()
+        Wplus[i] += eps
+        Wminus[i] -= eps
+        grad[i] = (f(Wplus.reshape(W_shape)) - f(Wminus.reshape(W_shape))) / (2*eps)
+    return grad.reshape(W_shape)
+
+def networkLoss(params, xb, yb):
+    h1 = forward(xb,params,'layer1') # First layer
+    probs = forward(h1,params,'output',softmax) # Second layer
+    loss, acc = compute_loss_and_acc(yb, probs)
+    return loss
 ##########################
 
 # save the old params
@@ -140,8 +183,17 @@ for k,v in params.items():
 
     ##########################
     ##### your code here #####
+    def evaForward(W):
+        params_this = params.copy()
+        params_this[k] = W
+        loss = networkLoss(params_this, x, y)
+        return loss
+
+    grad_this = numericalGradient(evaForward, params[k], eps=eps)
+    params["grad_"+k] = grad_this
     ##########################
 
+print("Q2.5.1 Gradient error check")
 total_error = 0
 for k in params.keys():
     if 'grad_' in k:

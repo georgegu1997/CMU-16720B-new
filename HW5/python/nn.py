@@ -97,7 +97,7 @@ def compute_loss_and_acc(y, probs):
     logf = np.log(probs)
     ylogf = y * logf
     sumylogf = ylogf.sum()
-    loss = -1.0 *  sumylogf
+    loss = - sumylogf
     ##########################
 
     return loss, acc
@@ -133,7 +133,7 @@ def backwards(delta,params,name='',activation_deriv=sigmoid_deriv):
     ##### your code here #####
     '''suppose the delta is dloss/dpost_act'''
     # post_act = sigmoid(pre_act)
-    dpre_act = delta * activation_deriv(delta) # (N, C)
+    dpre_act = delta * activation_deriv(post_act) # (N, C)
     # pre_act = XW + b.reshape((1,-1))
     db = dpre_act.sum(axis=0) # (C,)
     dXW = dpre_act # (N, C)
@@ -163,7 +163,8 @@ def get_random_batches(x,y,batch_size):
 
     batches = []
     for i in range(int(np.ceil(N/batch_size))):
-        batch = (x[i*batch_size:min((i+1)*batch_size, N)], y[i*batch_size:min((i+1)*batch_size, N)])
+        batch_idx = permuted_idx[i*batch_size:min((i+1)*batch_size, N)]
+        batch = (x[batch_idx], y[batch_idx])
         batches.append(batch)
 
     ##########################
