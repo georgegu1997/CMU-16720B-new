@@ -142,6 +142,37 @@ Because if we initialize all the weights with the same number, some of them will
 
 Because in one layer of neural net $\by=\bW\bx+\bb$, the variance of the output $\by$ depends on both the variance of input $\bx$ and variance of elements of the weight $\bW$. This is also true during the backpropagation of gradients. Therefore we scale the weight variance down by the layer size, To make the output variance of each layer equal to the input variance.
 
+\newpage
+
+\subsection*{Q3.1.2}
+
+The progression of the loss and accuracy during the training process is shown in Figure.~\ref{fig:q3.1.2}. Here the best learning rate I found is $2\times10^{-3}$.
+
+Learning rates affect training process in the sense that the best learning rate gives the best convergence. Overly high or overly low learning rates will both slow down the convergence or make the training not able to converge to local optima.
+
+Additionally, we can notice that large learning rates may cause the learning process to overshoot, which causes accuracy and loss to fluctuate during the training process.
+
+The final test accuracy of the best network is $78\%$.
+
+\begin{figure}[h!]
+    \begin{subfigure}{.325\textwidth}
+      \centering
+      \includegraphics[width=.95\linewidth]{../results/q3_1_2_2E-02.png}
+      \caption{Learning rate = $2\times10^{-2}$}
+    \end{subfigure}
+    \begin{subfigure}{.325\textwidth}
+      \centering
+      \includegraphics[width=.95\linewidth]{../results/q3_1_2_2E-03.png}
+      \caption{Learning rate = $2\times10^{-3}$}
+    \end{subfigure}
+    \begin{subfigure}{.325\textwidth}
+      \centering
+      \includegraphics[width=.95\linewidth]{../results/q3_1_2_2E-04.png}
+      \caption{Learning rate = $2\times10^{-4}$}
+    \end{subfigure}\hfill
+    \caption{Training progress on loss and accuracy using different learning rates. }
+    \label{fig:q3.1.2}
+\end{figure}
 
 
 
