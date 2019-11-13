@@ -33,7 +33,7 @@ The given translation is applied to all $x_j$ for $j\in \mathbb{R}$. Then for ea
 
 This shows that softmax is invariant to translation.
 
-When $c=-\max x_i$, all $x_i+c$ is between zero and one, and the difference between $e^{x_I}$ is relatively small. And when $c=0$, $e^{x_i}$ can be exponentially large and may cause numerical instability.
+When $c=-\max x_i$, all $x_i+c <0$ and $e^{x_i+c} \in (0,1)$, and the difference between $e^{x_I}$ is relatively small. And when $c=0$, $e^{x_i}$ can be exponentially large and may cause numerical instability.
 
 \newpage
 

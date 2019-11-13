@@ -28,6 +28,7 @@ def sigmoid(x):
 
     ##########################
     ##### your code here #####
+    res = 1 / (1+np.exp(-x))
     ##########################
 
     return res
@@ -48,11 +49,12 @@ def forward(X,params,name='',activation=sigmoid):
     W = params['W' + name]
     b = params['b' + name]
 
-
     ##########################
     ##### your code here #####
+    XW = X.dot(W)
+    pre_act = XW + b.reshape((1,-1))
+    post_act = activation(pre_act)
     ##########################
-
 
     # store the pre-activation and post-activation values
     # these will be important in backprop
@@ -68,6 +70,11 @@ def softmax(x):
 
     ##########################
     ##### your code here #####
+    c = - x.max(axis=1, keepdims=True)
+    xc = x + c
+    num = np.exp(xc)
+    den = num.sum(axis=1, keepdims=True)
+    res = num / den
     ##########################
 
     return res
@@ -81,6 +88,16 @@ def compute_loss_and_acc(y, probs):
 
     ##########################
     ##### your code here #####
+    # calculate the accuracy
+    pred_label = probs.argmax(axis=1)
+    label = y.argmax(axis=1)
+    acc = (pred_label == label).sum() / label.shape[0]
+
+    # calculate the cross-entropy loss
+    logf = np.log(probs)
+    ylogf = y * logf
+    sumylogf = ylogf.sum()
+    loss = -1.0 *  sumylogf
     ##########################
 
     return loss, acc
@@ -105,14 +122,28 @@ def backwards(delta,params,name='',activation_deriv=sigmoid_deriv):
     """
     grad_X, grad_W, grad_b = None, None, None
     # everything you may need for this layer
-    W = params['W' + name]
-    b = params['b' + name]
+    W = params['W' + name] # (D, C)
+    b = params['b' + name] # (C, )
+                           # X (N, D)
     X, pre_act, post_act = params['cache_' + name]
 
     # do the derivative through activation first
     # then compute the derivative W,b, and X
     ##########################
     ##### your code here #####
+    '''suppose the delta is dloss/dpost_act'''
+    # post_act = sigmoid(pre_act)
+    dpre_act = delta * activation_deriv(delta) # (N, C)
+    # pre_act = XW + b.reshape((1,-1))
+    db = dpre_act.sum(axis=0) # (C,)
+    dXW = dpre_act # (N, C)
+    # XW = X.dot(W)
+    dX = dXW.dot(W.T) # (N, D)
+    dW = X.T.dot(dXW) # (D, C)
+
+    grad_W = dW
+    grad_b = db
+    grad_X = dX
     ##########################
 
     # store the gradients
@@ -127,5 +158,13 @@ def get_random_batches(x,y,batch_size):
     batches = []
     ##########################
     ##### your code here #####
+    N = x.shape[0]
+    permuted_idx = np.random.permutation(np.arange(N))
+
+    batches = []
+    for i in range(int(np.ceil(N/batch_size))):
+        batch = (x[i*batch_size:min((i+1)*batch_size, N)], y[i*batch_size:min((i+1)*batch_size, N)])
+        batches.append(batch)
+
     ##########################
     return batches

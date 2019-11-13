@@ -32,21 +32,27 @@ assert(params['Wlayer1'].shape == (2,25))
 assert(params['blayer1'].shape == (25,))
 
 #expect 0, [0.05 to 0.12]
+print("Q2.1 test initialization")
 print("{}, {:.2f}".format(params['blayer1'].sum(),params['Wlayer1'].std()**2))
 print("{}, {:.2f}".format(params['boutput'].sum(),params['Woutput'].std()**2))
 
 # Q 2.2.1
 # implement sigmoid
 test = sigmoid(np.array([-1000,1000]))
+print("Q2.2.1 test sigmoid")
 print('should be zero and one\t',test.min(),test.max())
 # implement forward
 h1 = forward(x,params,'layer1')
-print(h1.shape)
+
+print("Q2.2.1 test forward path")
+print("forward() output shape:", h1.shape)
+
 # Q 2.2.2
 # implement softmax
 probs = forward(h1,params,'output',softmax)
 # make sure you understand these values!
 # positive, ~1, ~1, (40,4)
+print("Q2.2.2 test softmax")
 print(probs.min(),min(probs.sum(1)),max(probs.sum(1)),probs.shape)
 
 # Q 2.2.3
@@ -54,6 +60,7 @@ print(probs.min(),min(probs.sum(1)),max(probs.sum(1)),probs.shape)
 loss, acc = compute_loss_and_acc(y, probs)
 # should be around -np.log(0.25)*40 [~55] and 0.25
 # if it is not, check softmax!
+print("Q2.2.3 check compute_loss_and_acc()")
 print("{}, {:.2f}".format(loss,acc))
 
 # here we cheat for you
@@ -69,6 +76,7 @@ delta2 = backwards(delta1,params,'output',linear_deriv)
 backwards(delta2,params,'layer1',sigmoid_deriv)
 
 # W and b should match their gradients sizes
+print("Q2.3 gradient shape check")
 for k,v in sorted(list(params.items())):
     if 'grad' in k:
         name = k.split('_')[1]
@@ -77,6 +85,7 @@ for k,v in sorted(list(params.items())):
 # Q 2.4
 batches = get_random_batches(x,y,5)
 # print batch sizes
+print("Q2.4 batches splitting check")
 print([_[0].shape[0] for _ in batches])
 batch_num = len(batches)
 
@@ -92,7 +101,7 @@ for itr in range(max_iters):
         # forward
 
         # loss
-        # be sure to add loss and accuracy to epoch totals 
+        # be sure to add loss and accuracy to epoch totals
 
         # backward
 
@@ -102,13 +111,13 @@ for itr in range(max_iters):
         ##### your code here #####
         ##########################
 
-        
+
     if itr % 100 == 0:
         print("itr: {:02d} \t loss: {:.2f} \t acc : {:.2f}".format(itr,total_loss,avg_acc))
 
 
 # Q 2.5 should be implemented in this file
-# you can do this before or after training the network. 
+# you can do this before or after training the network.
 
 ##########################
 ##### your code here #####
@@ -120,7 +129,7 @@ params_orig = copy.deepcopy(params)
 
 eps = 1e-6
 for k,v in params.items():
-    if '_' in k: 
+    if '_' in k:
         continue
     # we have a real parameter!
     # for each value inside the parameter
@@ -128,7 +137,7 @@ for k,v in params.items():
     #   run the network
     #   get the loss
     #   compute derivative with central diffs
-    
+
     ##########################
     ##### your code here #####
     ##########################
