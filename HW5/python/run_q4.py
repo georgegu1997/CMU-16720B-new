@@ -43,7 +43,7 @@ for img in os.listdir('../images'):
     ##########################
     ##### your code here #####
     ##########################
-    
+
     # load the weights
     # run the crops through your neural network and print them out
     import pickle
@@ -53,4 +53,3 @@ for img in os.listdir('../images'):
     ##########################
     ##### your code here #####
     ##########################
-    

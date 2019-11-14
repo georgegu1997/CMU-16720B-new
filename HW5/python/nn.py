@@ -3,6 +3,35 @@ from util import *
 # do not include any more libraries here!
 # do not put any code outside of functions!
 
+class TwoLayerNet():
+    def __init__(self, input_size, hidden_size, output_size, params={}):
+        self.input_size = input_size
+        self.hidden_size = hidden_size
+        self.output_size = output_size
+        # initialize with the give weights
+        if len(params) > 0:
+            self.params = params
+        # random initialize the weights
+        else:
+            initialize_weights(input_size, hidden_size, params, "layer1")
+            initialize_weights(hidden_size, output_size, params, "output")
+
+    def predict(x):
+        h1 = forward(x, self.params, 'layer1') # First layer
+        probs = forward(h1, self.params, 'output', softmax) # Second layer
+        return probs
+
+    def loss(x, y):
+        probs = self.predict(x)
+        loss, acc = compute_loss_and_acc(y, probs)
+        return loss, acc
+
+    def backward(probs):
+        delta1 = probs.copy()
+        delta1[np.arange(probs.shape[0]), yb.argmax(axis=1)] -= 1
+        delta2 = backwards(delta1, params, 'output', linear_deriv)
+        backwards(delta2, params, 'layer1', sigmoid_deriv)
+
 ############################## Q 2.1 ##############################
 # initialize b to 0 vector
 # b should be a 1D array, not a 2D array with a singleton dimension

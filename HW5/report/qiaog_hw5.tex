@@ -210,6 +210,28 @@ The confusion matrix of the best model on the validation dataset is shown in Fig
     \label{fig:q3.1.4}
 \end{figure}
 
+\newpage
+
+\subsection*{Q4.1}
+
+The first assumption made is that each character is connected within itself and well separate from others, which means the method could fail if a character is splitted by background pixels or is connected to others by foreground pixels. Some examples where the method could fail are shown in Figure.~\ref{fig:q4.1} (a).
+
+The second assumption is that all character are written in the upright form (no large rotation is applied), each line of text is written horizontallly and text is written line by line. The method could fail if the text are written with large rotation, as shown in Figure.~\ref{fig:q4.1} (b).
+
+\begin{figure}[h!]
+    \begin{subfigure}{.495\textwidth}
+      \centering
+      \includegraphics[width=.5\linewidth]{../results/q4_1a.png}
+      \caption{The characters that are connected to each other (``ABC'') or divided into multiple parts (``D''). }
+    \end{subfigure}
+    \begin{subfigure}{.495\textwidth}
+      \centering
+      \includegraphics[width=.5\linewidth]{../results/q4_1b.png}
+      \caption{The characters that are not written in horizontal and rotated. }
+    \end{subfigure}\hfill
+    \caption{Possible failure cases of the text extraction pipeline. }
+    \label{fig:q4.1}
+\end{figure}
 
 
 

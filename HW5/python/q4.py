@@ -14,7 +14,7 @@ def findLetters(image):
     bboxes = []
     bw = None
     # insert processing in here
-    # one idea estimate noise -> denoise -> greyscale -> threshold -> morphology -> label -> skip small boxes 
+    # one idea estimate noise -> denoise -> greyscale -> threshold -> morphology -> label -> skip small boxes
     # this can be 10 to 15 lines of code using skimage functions
 
     ##########################
