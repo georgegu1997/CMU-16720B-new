@@ -6,7 +6,6 @@ train_data = scipy.io.loadmat('../data/nist36_train.mat')
 valid_data = scipy.io.loadmat('../data/nist36_valid.mat')
 test_data = scipy.io.loadmat('../data/nist36_test.mat')
 
-
 train_x, train_y = train_data['train_data'], train_data['train_labels']
 valid_x, valid_y = valid_data['valid_data'], valid_data['valid_labels']
 test_x, test_y = test_data['test_data'], test_data['test_labels']
@@ -20,16 +19,16 @@ hidden_size = 64
 ##### your code here #####
 # print(train_x.shape) # (10800, 1024)
 # print(train_y.shape) # (10800, 36)
+# print(valid_x.shape) # (3600, 1024)
+# print(test_x.shape) # (1800, 1024)
+
 input_size = train_x.shape[1]
 output_size = train_y.shape[1]
 batch_size = 50
 learning_rate = 2e-3
 ##########################
 
-params = {}
-
-def trainAndProgress(learning_rate = 2e-3):
-    global params
+def trainAndProgress(learning_rate = 2e-3, params = {}, max_iters = max_iters):
     np.random.seed(2019)
     batches = get_random_batches(train_x,train_y,batch_size)
     batch_num = len(batches)
@@ -145,10 +144,14 @@ def trainAndProgress(learning_rate = 2e-3):
 
     visualizaProgress()
     ##########################
+    return params
 
+print("Training the network with best learning_rate/10.0")
 trainAndProgress(learning_rate/10.0)
+print("\nTraining the network with best learning_rate*10.0")
 trainAndProgress(learning_rate*10.0)
-trainAndProgress(learning_rate)
+print("\nTraining the network with best learning_rate")
+params = trainAndProgress(learning_rate)
 
 if False: # view the data
     for crop in xb:
@@ -167,6 +170,32 @@ from mpl_toolkits.axes_grid1 import ImageGrid
 # visualize weights here
 ##########################
 ##### your code here #####
+def visualizeWeights(W):
+    fig = plt.figure(figsize=(10,10))
+    grid = ImageGrid(fig, 111,  # similar to subplot(111)
+                     nrows_ncols=(8,8),  # creates 2x2 grid of axes
+                     axes_pad=0.1,  # pad between axes in inch.
+                     )
+    ws = [w.reshape((32,32)) for w in W.T]
+    for ax, im in zip(grid, ws):
+        ax.imshow(im)
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+visualizeWeights(params['Wlayer1'])
+plt.title("After %d iterations" % max_iters)
+plt.savefig('../results/q3_1_3a.png')
+plt.close()
+# plt.show()
+
+params_init = {}
+initialize_weights(input_size, hidden_size, params_init, "layer1")
+initialize_weights(hidden_size, output_size, params_init, "output")
+visualizeWeights(params_init['Wlayer1'])
+plt.title("Before training")
+plt.savefig('../results/q3_1_3b.png')
+plt.close()
+# plt.show()
 ##########################
 
 # Q3.1.4
@@ -175,6 +204,17 @@ confusion_matrix = np.zeros((train_y.shape[1],train_y.shape[1]))
 # compute comfusion matrix here
 ##########################
 ##### your code here #####
+def constructConfusionMatrix(params, x, y):
+    m = np.zeros((y.shape[1],y.shape[1]))
+    h1 = forward(x,params,'layer1') # First layer
+    probs = forward(h1,params,'output',softmax) # Second layer
+    label = y.argmax(axis=1)
+    pred_label = probs.argmax(axis=1)
+    for i, j in zip(label, pred_label):
+        m[i, j] += 1
+    return m
+
+confusion_matrix = constructConfusionMatrix(params, valid_x, valid_y)
 ##########################
 
 import string
@@ -182,4 +222,5 @@ plt.imshow(confusion_matrix,interpolation='nearest')
 plt.grid(True)
 plt.xticks(np.arange(36),string.ascii_uppercase[:26] + ''.join([str(_) for _ in range(10)]))
 plt.yticks(np.arange(36),string.ascii_uppercase[:26] + ''.join([str(_) for _ in range(10)]))
+plt.colorbar()
 plt.show()
