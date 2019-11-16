@@ -24,7 +24,7 @@ for img in os.listdir('../images'):
     im1 = skimage.img_as_float(skimage.io.imread(os.path.join('../images',img)))
     bboxes, bw = findLetters(im1)
 
-    plt.imshow(bw)
+    plt.imshow(bw, cmap="gray")
     for bbox in bboxes:
         minr, minc, maxr, maxc = bbox
         rect = matplotlib.patches.Rectangle((minc, minr), maxc - minc, maxr - minr,
