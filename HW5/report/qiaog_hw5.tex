@@ -265,7 +265,7 @@ The character detection results are shown in Figure.~\ref{fig:q4.3}. Note that t
 \end{figure}
 
 \newpage
-\subsection{Q4.4}
+\subsection*{Q4.4}
 
 The extracted texts are shown as follows:
 
@@ -294,6 +294,38 @@ CEEPTRLEARNING
 5EEAE5TIEARNING
 \end{verbatim}
 
+\newpage
 
+\subsection*{Q5.2}
+
+The plotted training loss is shown in Figure.~\ref{fig:q5.2}.
+
+As training process progresses, the training loss first drops quickly and then plateau at the low level.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.8\linewidth]{../results/q5_2.png}
+    \caption{The training loss curve of the Autoencoder. }
+    \label{fig:q5.2}
+\end{figure}
+
+\newpage
+
+\subsection*{Q5.3.1}
+
+The validation images and their reconstructions results are shown in Figure.~\ref{fig:q5.3.1}. As shown in the figure, the reconstructions results is more blur compared to the input images. Moreover, there is circle ``area of reconstruction'', and the contents within that circle can be better reconstructed than those outside (As shown by the first row of Figure.~\ref{fig:q5.3.1}). This is probably because the contents of training images are mostly centered in that circle.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.8\linewidth]{../results/q5_3_1.png}
+    \caption{The validation images (input) and their reconstructions (output). }
+    \label{fig:q5.3.1}
+\end{figure}
+
+\newpage
+
+\subsection{Q5.3.2}
+
+The average PSNR over the validation set is 16.084.
 
 \end{document}

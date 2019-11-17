@@ -16,17 +16,17 @@ class TwoLayerNet():
             initialize_weights(input_size, hidden_size, params, "layer1")
             initialize_weights(hidden_size, output_size, params, "output")
 
-    def predict(x):
+    def predict(self, x):
         h1 = forward(x, self.params, 'layer1') # First layer
         probs = forward(h1, self.params, 'output', softmax) # Second layer
         return probs
 
-    def loss(x, y):
+    def loss(self, x, y):
         probs = self.predict(x)
         loss, acc = compute_loss_and_acc(y, probs)
         return loss, acc
 
-    def backward(probs):
+    def backward(self, probs):
         delta1 = probs.copy()
         delta1[np.arange(probs.shape[0]), yb.argmax(axis=1)] -= 1
         delta2 = backwards(delta1, params, 'output', linear_deriv)
