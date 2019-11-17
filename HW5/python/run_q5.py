@@ -141,6 +141,7 @@ import matplotlib.pyplot as plt
 
 ##########################
 ##### your code here #####
+np.random.seed(2020)
 selected_classes = np.random.choice(np.arange(36), 5)
 fig, axes = plt.subplots(nrows=5, ncols=4)
 for i, c in enumerate(selected_classes):

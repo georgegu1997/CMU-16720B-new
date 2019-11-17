@@ -235,7 +235,7 @@ The second assumption is that all character are written in the upright form (no 
 
 \newpage
 
-\subsection{Q4.3}
+\subsection*{Q4.3}
 
 The character detection results are shown in Figure.~\ref{fig:q4.3}. Note that the bounding boxes are directly estimate from the connected pixels and thus they are not padded by now.
 
@@ -318,14 +318,71 @@ The validation images and their reconstructions results are shown in Figure.~\re
 \begin{figure}[h!]
     \centering
     \includegraphics[width=.8\linewidth]{../results/q5_3_1.png}
-    \caption{The validation images (input) and their reconstructions (output). }
+    \caption{The validation images (input) and their reconstructions (output) using Autoencoder. }
     \label{fig:q5.3.1}
 \end{figure}
 
 \newpage
 
-\subsection{Q5.3.2}
+\subsection*{Q5.3.2}
 
 The average PSNR over the validation set is 16.084.
+
+\newpage
+
+\subsection*{Q6.1}
+
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bA}{\mathbf{A}}
+\newcommand{\bC}{\mathbf{C}}
+\newcommand{\bU}{\mathbf{U}}
+\newcommand{\bu}{\mathbf{u}}
+\newcommand{\bV}{\mathbf{V}}
+\newcommand{\bv}{\mathbf{v}}
+\newcommand{\bS}{\mathbf{S}}
+
+Suppose our data matrix is $\bA \in \mathbb{R}^{M\times N}$, where $N$ is the number of data points in the dataset and $M$ is number of dimension for each data point (here is the number of pixels in each image). Then each column of $\bX$ is a datapoint, and consider the SVD decomposition
+\begin{align} \label{eq:SVD}
+  \bA = \bU\bS\bV^T  = \sum_{i=1}^K \bu_i \sigma_i \bv_i^T,
+\end{align}
+where $K=\min\{M, N\}$, $\bu_i$, $\bv_i$ is the $i^{th}$ column of $\bU$ and $\bV$ respectively,
+and $\sigma_i$ is the $i^{th}$ diagonal element in $\bS$.
+
+To give the best $k$-rank approximation of $\bA$ in terms of frobenius, we can simply take the first $k$ terms in the summation in Eq.~\ref{eq:SVD}, which means
+\begin{align}
+  \hat{\bA} = \sum_{i=1}^k \bu_i \sigma_i \bv_i^T = \bX \bC,
+\end{align}
+
+where the principle components $\bX$ and the compressed data matrix $\bC$ are defined to be
+
+\begin{align}
+  \bX = [ \bu_1\;\bu_2\;\dots\;\bu_k ] \quad
+  \bC =
+  \begin{bmatrix}
+    \sigma_1\bv_1^T \\ \sigma_2\bv_2^T \\ \dots \\ \sigma_k\bv_k^T
+  \end{bmatrix},
+\end{align}
+
+where each column of $\bC$ is a compressed representation of the original data point in the corresponding column of $\bA$.
+
+To get $\bC$ for any other input $\bA'$, we can simply simply calculate $\bX^T\bA'$, where we can define $\bX^T$ as the projection matrix
+In our case, $M=1024$ and $k=32$, and thus the size of the projection matrix $\bX^T$ is $(1024 \times 32)$ and its rank is 32.
+
+\newpage
+
+\subsection*{Q6.2}
+
+The validation images and their reconstructions results using PCA are shown in Figure.~\ref{fig:q5.3.1}. As we can see, besides that the output are blur, the reconstructed images are generally more gray, and this is because that PCA captures the overall variance on all space as its first principle component. When doing projection, the total density is smoothed and spread by it and cause the whole image to be gray.
+
+The average PSNR over the validation set is 16.284.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=.8\linewidth]{../results/q6_2.png}
+    \caption{The validation images (input) and their reconstructions (recon) using PCA. }
+    \label{fig:q6.2}
+\end{figure}
+
+
 
 \end{document}
