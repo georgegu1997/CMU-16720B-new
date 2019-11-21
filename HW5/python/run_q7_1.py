@@ -273,6 +273,60 @@ def EMNISTConv(device):
     torch.save(net.state_dict(), "../results/EMNISTConv.pk")
     return net
 
+def testEMNISTConv(device, model_path="../results/EMNISTConv.pk"):
+    from q4 import findLetters
+    from run_q4 import cluster
+    # Load the pre-trained network
+    net = ConvNet(num_class=47).to(device)
+    net.load_state_dict(torch.load(model_path))
+    net.eval()
+
+    for img in os.listdir('../images'):
+        im1 = skimage.img_as_float(skimage.io.imread(os.path.join('../images',img)))
+        bboxes, bw = findLetters(im1)
+
+    # Cluster
+    classes = cluster(bboxes)
+    # Group the bboxes by class
+    line_labels = np.unique(classes)
+    line_idx = []
+    for label in line_labels:
+        this_line_idx = np.where(classes == label)[0]
+        # Sort characters by x coordinates
+        this_line_idx = this_line_idx[bboxes[this_line_idx, 1].argsort()]
+        line_idx.append(this_line_idx)
+    # Sort lines by the first y index
+    first_ys = np.array([bboxes[line[0], 0] for line in line_idx])
+    sorted_line_idx = []
+    for i in first_ys.argsort():
+        sorted_line_idx.append(line_idx[i])
+    line_idx = sorted_line_idx
+
+    # crop the bounding boxes
+    X = []
+    pad_width = 5
+    img_width = 28
+    for box in bboxes:
+        y1, x1, y2, x2 = box
+        cx, cy = (x1+x2)/2.0, (y1+y2)/2.0
+        l = max(y2-y1, x2-x1)
+        nx1, nx2 = int(cx-l/2), int(cx+l/2)
+        ny1, ny2 = int(cy-l/2), int(cy+l/2)
+        crop = bw[ny1:ny2, nx1:nx2].copy()
+        crop = skimage.transform.resize(crop.astype(float), (img_width-pad_width*2, img_width-pad_width*2))
+        crop = 1 - (crop < 0.9)
+        crop = np.pad(crop, pad_width=pad_width, mode='constant', constant_values=1)
+        # plt.imshow(crop, cmap='gray')
+        # plt.show()
+        X.append(crop.T.reshape(-1))
+    X = np.array(X)
+
+    # Convert input to torch format and forward
+    X = torch.Tensor(X, device=device)
+    print(X.shape)
+    # probs = net(X)
+
+
 def main():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("device:", device)
@@ -286,8 +340,12 @@ def main():
         print("Q7.1.3: Train a CNN on NIST36")
         NISTConv(device)
     if sys.argv[1] == "7.1.4":
-        print("Q7.1.3: Train a CNN on EMNIST Balanced")
-        EMNISTConv(device)
+        if sys.argv[2] == "train":
+            print("Q7.1.4: Train a CNN on EMNIST Balanced")
+            EMNISTConv(device)
+        if sys.argv[2] == "test":
+            print("Q7.1.4: Test the trained Conv on findLetters in Q4")
+            testEMNISTConv(device)
 
 if __name__ == '__main__':
     main()
