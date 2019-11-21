@@ -69,86 +69,90 @@ def cluster(bboxes):
         C[C==v] = i
     return C
 
-for img in os.listdir('../images'):
-    im1 = skimage.img_as_float(skimage.io.imread(os.path.join('../images',img)))
-    bboxes, bw = findLetters(im1)
+def main():
+    for img in os.listdir('../images'):
+        im1 = skimage.img_as_float(skimage.io.imread(os.path.join('../images',img)))
+        bboxes, bw = findLetters(im1)
 
-    plt.imshow(bw, cmap="gray")
-    for bbox in bboxes:
-        minr, minc, maxr, maxc = bbox
-        rect = matplotlib.patches.Rectangle((minc, minr), maxc - minc, maxr - minr,
-                                fill=False, edgecolor='red', linewidth=2)
-        plt.gca().add_patch(rect)
-    # plt.show()
-    # find the rows using..RANSAC, counting, clustering, etc.
-    ##########################
-    ##### your code here #####
-    # # Sort the bounding box by their x coordinate
-    # bboxes = bboxes[bboxes[:, 1].argsort()]
-
-    # Cluster
-    classes = cluster(bboxes)
-    # Group the bboxes by class
-    line_labels = np.unique(classes)
-    line_idx = []
-    for label in line_labels:
-        this_line_idx = np.where(classes == label)[0]
-        # Sort characters by x coordinates
-        this_line_idx = this_line_idx[bboxes[this_line_idx, 1].argsort()]
-        line_idx.append(this_line_idx)
-    # Sort lines by the first y index
-    first_ys = np.array([bboxes[line[0], 0] for line in line_idx])
-    sorted_line_idx = []
-    for i in first_ys.argsort():
-        sorted_line_idx.append(line_idx[i])
-    line_idx = sorted_line_idx
-    ##########################
-
-    # crop the bounding boxes
-    # note.. before you flatten, transpose the image (that's how the dataset is!)
-    # consider doing a square crop, and even using np.pad() to get your images looking more like the dataset
-    ##########################
-    ##### your code here #####
-    X = []
-    pad_width = 5
-    for box in bboxes:
-        y1, x1, y2, x2 = box
-        cx, cy = (x1+x2)/2.0, (y1+y2)/2.0
-        l = max(y2-y1, x2-x1)
-        nx1, nx2 = int(cx-l/2), int(cx+l/2)
-        ny1, ny2 = int(cy-l/2), int(cy+l/2)
-        crop = bw[ny1:ny2, nx1:nx2].copy()
-        crop = skimage.transform.resize(crop.astype(float), (32-pad_width*2, 32-pad_width*2))
-        crop = 1 - (crop < 0.9)
-        crop = np.pad(crop, pad_width=pad_width, mode='constant', constant_values=1)
-        # plt.imshow(crop, cmap='gray')
+        plt.imshow(bw, cmap="gray")
+        for bbox in bboxes:
+            minr, minc, maxr, maxc = bbox
+            rect = matplotlib.patches.Rectangle((minc, minr), maxc - minc, maxr - minr,
+                                    fill=False, edgecolor='red', linewidth=2)
+            plt.gca().add_patch(rect)
         # plt.show()
-        X.append(crop.T.reshape(-1))
-    X = np.array(X)
-    ##########################
+        # find the rows using..RANSAC, counting, clustering, etc.
+        ##########################
+        ##### your code here #####
+        # # Sort the bounding box by their x coordinate
+        # bboxes = bboxes[bboxes[:, 1].argsort()]
 
-    # load the weights
-    # run the crops through your neural network and print them out
-    import pickle
-    import string
-    letters = np.array([_ for _ in string.ascii_uppercase[:26]] + [str(_) for _ in range(10)])
-    params = pickle.load(open('q3_weights.pickle','rb'))
-    ##########################
-    ##### your code here #####
-    # Forward
-    h1 = forward(X, params, 'layer1') # First layer
-    probs = forward(h1, params, 'output', softmax) # Second layer
-    pred_label = probs.argmax(axis=1)
+        # Cluster
+        classes = cluster(bboxes)
+        # Group the bboxes by class
+        line_labels = np.unique(classes)
+        line_idx = []
+        for label in line_labels:
+            this_line_idx = np.where(classes == label)[0]
+            # Sort characters by x coordinates
+            this_line_idx = this_line_idx[bboxes[this_line_idx, 1].argsort()]
+            line_idx.append(this_line_idx)
+        # Sort lines by the first y index
+        first_ys = np.array([bboxes[line[0], 0] for line in line_idx])
+        sorted_line_idx = []
+        for i in first_ys.argsort():
+            sorted_line_idx.append(line_idx[i])
+        line_idx = sorted_line_idx
+        ##########################
 
-    chars = string.ascii_uppercase[:26] + ''.join([str(_) for _ in range(10)])
-    text_by_line = []
-    for r in line_idx:
-        line = ""
-        for idx in r:
-            line += chars[pred_label[int(idx)]]
-        text_by_line.append(line)
+        # crop the bounding boxes
+        # note.. before you flatten, transpose the image (that's how the dataset is!)
+        # consider doing a square crop, and even using np.pad() to get your images looking more like the dataset
+        ##########################
+        ##### your code here #####
+        X = []
+        pad_width = 5
+        for box in bboxes:
+            y1, x1, y2, x2 = box
+            cx, cy = (x1+x2)/2.0, (y1+y2)/2.0
+            l = max(y2-y1, x2-x1)
+            nx1, nx2 = int(cx-l/2), int(cx+l/2)
+            ny1, ny2 = int(cy-l/2), int(cy+l/2)
+            crop = bw[ny1:ny2, nx1:nx2].copy()
+            crop = skimage.transform.resize(crop.astype(float), (32-pad_width*2, 32-pad_width*2))
+            crop = 1 - (crop < 0.9)
+            crop = np.pad(crop, pad_width=pad_width, mode='constant', constant_values=1)
+            # plt.imshow(crop, cmap='gray')
+            # plt.show()
+            X.append(crop.T.reshape(-1))
+        X = np.array(X)
+        ##########################
 
-    print()
-    for line in text_by_line:
-        print(line)
-    ##########################
+        # load the weights
+        # run the crops through your neural network and print them out
+        import pickle
+        import string
+        letters = np.array([_ for _ in string.ascii_uppercase[:26]] + [str(_) for _ in range(10)])
+        params = pickle.load(open('q3_weights.pickle','rb'))
+        ##########################
+        ##### your code here #####
+        # Forward
+        h1 = forward(X, params, 'layer1') # First layer
+        probs = forward(h1, params, 'output', softmax) # Second layer
+        pred_label = probs.argmax(axis=1)
+
+        chars = string.ascii_uppercase[:26] + ''.join([str(_) for _ in range(10)])
+        text_by_line = []
+        for r in line_idx:
+            line = ""
+            for idx in r:
+                line += chars[pred_label[int(idx)]]
+            text_by_line.append(line)
+
+        print()
+        for line in text_by_line:
+            print(line)
+        ##########################
+
+if __name__ == '__main__':
+    main()

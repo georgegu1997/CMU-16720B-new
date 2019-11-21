@@ -25,6 +25,10 @@ def trainNetwork(num_epochs, trainloader, device, optimizer, net, criterion):
         for i, data in enumerate(trainloader, 0):
             x, y = data[0].to(device), data[1].to(device)
 
+            # for xx in x:
+            #     plt.imshow(xx[0].detach().numpy(), cmap='gray')
+            #     plt.show()
+
             # zero the parameter gradients
             optimizer.zero_grad()
 
@@ -276,56 +280,69 @@ def EMNISTConv(device):
 def testEMNISTConv(device, model_path="../results/EMNISTConv.pk"):
     from q4 import findLetters
     from run_q4 import cluster
+    import os, skimage, string
     # Load the pre-trained network
     net = ConvNet(num_class=47).to(device)
-    net.load_state_dict(torch.load(model_path))
+    net.load_state_dict(torch.load(model_path, map_location=device))
     net.eval()
 
     for img in os.listdir('../images'):
         im1 = skimage.img_as_float(skimage.io.imread(os.path.join('../images',img)))
         bboxes, bw = findLetters(im1)
 
-    # Cluster
-    classes = cluster(bboxes)
-    # Group the bboxes by class
-    line_labels = np.unique(classes)
-    line_idx = []
-    for label in line_labels:
-        this_line_idx = np.where(classes == label)[0]
-        # Sort characters by x coordinates
-        this_line_idx = this_line_idx[bboxes[this_line_idx, 1].argsort()]
-        line_idx.append(this_line_idx)
-    # Sort lines by the first y index
-    first_ys = np.array([bboxes[line[0], 0] for line in line_idx])
-    sorted_line_idx = []
-    for i in first_ys.argsort():
-        sorted_line_idx.append(line_idx[i])
-    line_idx = sorted_line_idx
+        # Cluster
+        classes = cluster(bboxes)
+        # Group the bboxes by class
+        line_labels = np.unique(classes)
+        line_idx = []
+        for label in line_labels:
+            this_line_idx = np.where(classes == label)[0]
+            # Sort characters by x coordinates
+            this_line_idx = this_line_idx[bboxes[this_line_idx, 1].argsort()]
+            line_idx.append(this_line_idx)
+        # Sort lines by the first y index
+        first_ys = np.array([bboxes[line[0], 0] for line in line_idx])
+        sorted_line_idx = []
+        for i in first_ys.argsort():
+            sorted_line_idx.append(line_idx[i])
+        line_idx = sorted_line_idx
 
-    # crop the bounding boxes
-    X = []
-    pad_width = 5
-    img_width = 28
-    for box in bboxes:
-        y1, x1, y2, x2 = box
-        cx, cy = (x1+x2)/2.0, (y1+y2)/2.0
-        l = max(y2-y1, x2-x1)
-        nx1, nx2 = int(cx-l/2), int(cx+l/2)
-        ny1, ny2 = int(cy-l/2), int(cy+l/2)
-        crop = bw[ny1:ny2, nx1:nx2].copy()
-        crop = skimage.transform.resize(crop.astype(float), (img_width-pad_width*2, img_width-pad_width*2))
-        crop = 1 - (crop < 0.9)
-        crop = np.pad(crop, pad_width=pad_width, mode='constant', constant_values=1)
-        # plt.imshow(crop, cmap='gray')
-        # plt.show()
-        X.append(crop.T.reshape(-1))
-    X = np.array(X)
+        # crop the bounding boxes
+        X = []
+        pad_width = 2
+        img_width = 28
+        for box in bboxes:
+            y1, x1, y2, x2 = box
+            cx, cy = (x1+x2)/2.0, (y1+y2)/2.0
+            l = max(y2-y1, x2-x1)
+            nx1, nx2 = int(cx-l/2), int(cx+l/2)
+            ny1, ny2 = int(cy-l/2), int(cy+l/2)
+            crop = bw[ny1:ny2, nx1:nx2].copy()
+            crop = skimage.transform.resize(crop.astype(float), (img_width-pad_width*2, img_width-pad_width*2))
+            crop = (crop < 0.8).T
+            crop = np.pad(crop, pad_width=pad_width, mode='constant', constant_values=0)
+            X.append(crop)
+            # plt.imshow(crop, cmap='gray')
+            # plt.show()
+        X = np.array(X)
 
-    # Convert input to torch format and forward
-    X = torch.Tensor(X, device=device)
-    print(X.shape)
-    # probs = net(X)
+        # Convert input to torch format and forward
+        X = torch.Tensor(X, device=device).unsqueeze(1)
+        probs = net(X)
+        pred_label = probs.argmax(axis=1)
 
+        # The mapping of the EMNIST balanced dataset
+        chars = ''.join([str(_) for _ in range(10)]) + string.ascii_uppercase[:26] + "abdefghnqrt"
+        text_by_line = []
+        for r in line_idx:
+            line = ""
+            for idx in r:
+                line += chars[pred_label[int(idx)]]
+            text_by_line.append(line)
+
+        print()
+        for line in text_by_line:
+            print(line)
 
 def main():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
