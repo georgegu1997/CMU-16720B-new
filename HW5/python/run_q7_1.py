@@ -11,58 +11,107 @@ import torchvision
 import torchvision.transforms as transforms
 
 '''
+To check the overall accuracy over a dataset
+Refer to: https://gist.github.com/jcjohnson/6e41e8512c17eae5da50aebef3378a4c
+'''
+def checkAccLoss(net, loader, criterion, device):
+    total_loss = 0.0
+    num_correct, num_samples = 0, 0
+    net.eval()
+    for data in loader:
+        x, y = data[0].to(device), data[1].to(device)
+        outputs = net(x)
+        num_correct += (outputs.argmax(1) == y).sum()
+        num_samples += x.shape[0]
+        loss = criterion(outputs, y)
+        total_loss += loss.item()
+    acc = float(num_correct) / num_samples
+    return acc, total_loss
+
+'''
+Run a single training epoch
+Refer to: https://gist.github.com/jcjohnson/6e41e8512c17eae5da50aebef3378a4c
+'''
+def runEpoch(net, criterion, loader, optimizer, device):
+    net.train()
+    for data in loader:
+        x, y = data[0].to(device), data[1].to(device)
+        outputs = net(x)
+        loss = criterion(outputs, y)
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+'''
 Utilities for training a network and Visualize its training progress
 '''
-def trainNetwork(num_epochs, trainloader, device, optimizer, net, criterion):
+def trainNetwork(num_epochs, trainloader, device, optimizer, net, criterion, valloader = None, acc_freq=1):
     net.to(device)
     epoch_list = []
     train_acc_list = []
     train_loss_list = []
+    valid_acc_list = []
+    valid_loss_list = []
 
+    # Before training, the initial loss and accuracy
+    train_acc, train_loss = checkAccLoss(net, trainloader, criterion, device)
+    epoch_list.append(0)
+    train_acc_list.append(train_acc)
+    train_loss_list.append(train_loss)
+    if not valloader is None:
+        valid_acc, valid_loss = checkAccLoss(net, valloader, criterion, device)
+        valid_acc_list.append(valid_acc)
+        valid_loss_list.append(valid_loss)
+        print("epoch: {:02d} \t loss: {:.2f} \t acc : {:.2f} \t valid loss: {:.2f} \t valid acc: {:.2f}".format(
+            0,train_loss,train_acc,valid_loss,valid_acc
+        ))
+    else:
+        print("epoch: {:02d} \t loss: {:.2f} \t acc : {:.2f}".format(0,train_loss,train_acc))
+
+    # Start the training process
     for epoch in range(num_epochs):
-        total_loss = 0.0
-        total_acc = 0.0
-        for i, data in enumerate(trainloader, 0):
-            x, y = data[0].to(device), data[1].to(device)
-
-            # for xx in x:
-            #     plt.imshow(xx[0].detach().numpy(), cmap='gray')
-            #     plt.show()
-
-            # zero the parameter gradients
-            optimizer.zero_grad()
-
-            # forward + backward + optimize
-            outputs = net(x)
-            loss = criterion(outputs, y)
-            loss.backward()
-            optimizer.step()
-
-            # print statistics
-            total_acc += (outputs.argmax(1) == y).sum().float() / len(y)
-            total_loss += loss.item() * len(x)
-
-        total_acc /= len(trainloader)
-        if epoch % 1 == 0:
-            print("epoch: {:02d} \t loss: {:.2f} \t acc : {:.2f}".format(epoch,total_loss,total_acc))
+        # forward, backward and update
+        runEpoch(net, criterion, trainloader, optimizer, device)
+        # compute loss and accuracy, record them
+        if epoch % acc_freq == 0:
+            train_acc, train_loss = checkAccLoss(net, trainloader, criterion, device)
+            if valloader is None:
+                print("epoch: {:02d} \t loss: {:.2f} \t acc : {:.2f}".format(epoch,train_loss,train_acc))
+            # If valloader passed in, then run through valloader as validation
+            else:
+                valid_acc, valid_loss = checkAccLoss(net, valloader, criterion, device)
+                print("epoch: {:02d} \t loss: {:.2f} \t acc : {:.2f} \t valid loss: {:.2f} \t valid acc: {:.2f}".format(
+                    epoch,train_loss,train_acc,valid_loss,valid_acc
+                ))
+                valid_acc_list.append(valid_acc)
+                valid_loss_list.append(valid_loss)
             epoch_list.append(epoch+1)
-            train_acc_list.append(total_acc)
-            train_loss_list.append(total_loss)
+            train_acc_list.append(train_acc)
+            train_loss_list.append(train_loss)
 
-    return net, epoch_list, train_loss_list, train_acc_list
+    if valloader is None:
+        return net, epoch_list, train_loss_list, train_acc_list
+    else:
+        return net, epoch_list, train_loss_list, train_acc_list, valid_loss_list, valid_acc_list
 
-def visualizeTrainProgress(epoch_list, train_loss_list, train_acc_list):
+def visualizeTrainProgress(epoch_list, train_loss_list, train_acc_list, valid_loss_list=None, valid_acc_list=None):
     plt.figure(figsize=(8, 12))
     plt.subplot(211)
     plt.plot(epoch_list, train_acc_list, label="Training")
+    if not valid_acc_list is None:
+        plt.plot(epoch_list, valid_acc_list, label="Validation")
+    plt.legend()
     plt.xlabel("Epoch")
     plt.ylabel("Accuracy")
 
     plt.subplot(212)
     plt.plot(epoch_list, train_loss_list, label="Training")
+    if not valid_loss_list is None:
+        plt.plot(epoch_list, valid_loss_list, label="Validation")
+    plt.legend()
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
-
     plt.subplot(211)
 
 '''
@@ -245,7 +294,7 @@ For Q7.1.4
 '''
 def EMNISTConv(device):
     batch_size = 64
-    num_epochs = 50
+    num_epochs = 20
     learning_rate = 0.1
 
     # Data pre-processing
@@ -256,10 +305,12 @@ def EMNISTConv(device):
     # dataset and dataLoader
     kwargs = {'num_workers': 1, 'pin_memory': True} if torch.cuda.is_available() else {}
     torchvision.datasets.EMNIST.url = 'http://www.itl.nist.gov/iaui/vip/cs_links/EMNIST/gzip.zip'
-    dataset = torchvision.datasets.EMNIST('../data', split="balanced", train=True, download=True, transform=transform)
-    trainloader = torch.utils.data.DataLoader(
-        dataset, batch_size=batch_size, shuffle=True, **kwargs
-        )
+
+    # Use the testing dataset as the validation set during training to see whether overfit
+    trainset = torchvision.datasets.EMNIST('../data', split="balanced", train=True, download=True, transform=transform)
+    testset = torchvision.datasets.EMNIST('../data', split="balanced", train=False, download=True, transform=transform)
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True, **kwargs)
+    valloader = torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=True, **kwargs)
 
     # Define the network, loss function and optimizer
     net = ConvNet(num_class=47).to(device)
@@ -267,10 +318,12 @@ def EMNISTConv(device):
     criterion = F.nll_loss
 
     # Train the network
-    net, epoch_list, train_loss_list, train_acc_list = trainNetwork(num_epochs, trainloader, device, optimizer, net, criterion)
+    net, epoch_list, train_loss_list, train_acc_list, valid_loss_list, valid_acc_list = trainNetwork(
+        num_epochs, trainloader, device, optimizer, net, criterion, valloader=valloader
+    )
 
     # Visualize the training progress and save plot
-    visualizeTrainProgress(epoch_list, train_loss_list, train_acc_list)
+    visualizeTrainProgress(epoch_list, train_loss_list, train_acc_list, valid_loss_list, valid_acc_list)
     plt.title("Q 7.1.4")
     plt.savefig('../results/q7_1_4.png')
 
