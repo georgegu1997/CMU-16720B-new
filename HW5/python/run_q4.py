@@ -20,6 +20,36 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=UserWarning)
 
+GROUND_TRUTH = [
+    [
+    "TODOLIST",
+    "1MAKEATODOLIST",
+    "2CHECKOFFTHEFIRST",
+    "THINGONTODOLIST",
+    "3REALIZEYOUHAVEALREADY",
+    "COMPLETED2THINGS",
+    "4REWARDYOURSELFWITH",
+    "ANAP",
+    ],
+    [
+    "ABCDEFG",
+    "HIJKLMN",
+    "OPQRSTU",
+    "VWXYZ",
+    "1234567890",
+    ],
+    [
+    "HAIKUSAREEASY",
+    "BUTSOMETIMESTHRYDONTMAKESENSE",
+    "REFRIGERATOR",
+    ],
+    [
+    "DEEPLEARNING",
+    "DEEPERLEARNING",
+    "DEEPESTLEARNING",
+    ]
+]
+
 '''
 Hierarchical clustering method on y coordinates of the bboxes to find rows in detection results
     Specifically, Single Linkage clustering
@@ -69,8 +99,19 @@ def cluster(bboxes):
         C[C==v] = i
     return C
 
+def evaluateOCRResults(text_by_line, gt):
+    correct_num, total_num = 0.0, 0.0
+    for line, line_gt in zip(text_by_line, gt):
+        print(line)
+        print(line_gt)
+        for l, lgt in zip(line, line_gt):
+            if l == lgt:
+                correct_num +=1
+            total_num += 1
+    print("Accuracy: %.3f" % (correct_num / total_num))
+
 def main():
-    for img in os.listdir('../images'):
+    for img_i, img in enumerate(os.listdir('../images')):
         im1 = skimage.img_as_float(skimage.io.imread(os.path.join('../images',img)))
         bboxes, bw = findLetters(im1)
 
@@ -150,8 +191,8 @@ def main():
             text_by_line.append(line)
 
         print()
-        for line in text_by_line:
-            print(line)
+        print("Image:", img)
+        evaluateOCRResults(text_by_line, GROUND_TRUTH[img_i])
         ##########################
 
 if __name__ == '__main__':

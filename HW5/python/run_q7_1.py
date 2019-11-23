@@ -332,14 +332,14 @@ def EMNISTConv(device):
 
 def testEMNISTConv(device, model_path="../results/EMNISTConv.pk"):
     from q4 import findLetters
-    from run_q4 import cluster
+    from run_q4 import cluster, GROUND_TRUTH, evaluateOCRResults
     import os, skimage, string
     # Load the pre-trained network
     net = ConvNet(num_class=47).to(device)
     net.load_state_dict(torch.load(model_path, map_location=device))
     net.eval()
 
-    for img in os.listdir('../images'):
+    for img_i, img in enumerate(os.listdir('../images')):
         im1 = skimage.img_as_float(skimage.io.imread(os.path.join('../images',img)))
         bboxes, bw = findLetters(im1)
 
@@ -394,8 +394,8 @@ def testEMNISTConv(device, model_path="../results/EMNISTConv.pk"):
             text_by_line.append(line)
 
         print()
-        for line in text_by_line:
-            print(line)
+        print("Image:", img)
+        evaluateOCRResults(text_by_line, GROUND_TRUTH[img_i])
 
 def main():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
