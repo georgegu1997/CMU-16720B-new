@@ -103,7 +103,7 @@ def evaluateOCRResults(text_by_line, gt):
     correct_num, total_num = 0.0, 0.0
     for line, line_gt in zip(text_by_line, gt):
         print(line)
-        print(line_gt)
+        # print(line_gt)
         for l, lgt in zip(line, line_gt):
             if l == lgt:
                 correct_num +=1
