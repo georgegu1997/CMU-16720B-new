@@ -146,7 +146,7 @@ Because in one layer of neural net $\by=\bW\bx+\bb$, the variance of the output 
 
 \subsection*{Q3.1.2}
 
-The progression of the loss and accuracy during the training process is shown in Figure.~\ref{fig:q3.1.2}. Here the best learning rate I found is $2\times10^{-3}$.
+The progression of the loss and accuracy during different training processes is shown in Figure.~\ref{fig:q3.1.2}. Here the best learning rate I found is $2\times10^{-3}$.
 
 Learning rates affect training process in the sense that the best learning rate gives the best convergence. Overly high or overly low learning rates will both slow down the convergence or make the training not able to converge to local optima.
 
@@ -201,7 +201,7 @@ And before training, the visualized weights are just random noise and no structu
 
 \subsection*{Q3.1.4}
 
-The confusion matrix of the best model on the testing dataset is shown in Figure.~\ref{fig:q3.1.4}. As shown by some entries with high values in the matrix, the network is likely mix the digit ``0'' with the character `'O'', the character ``S'' with the digit ``5'', and digit ``1'' with character ``I''. These results are quite reasonable as these pairs have very similar shape and even some human can get confused by them.
+The confusion matrix of the best model on the testing dataset is shown in Figure.~\ref{fig:q3.1.4}. As shown by some entries with high values in the matrix, the network is likely mix the digit ``0'' with the character `'O'', the character ``S'' with the digit ``5'', the character ``Z'' with the digit ``2'' and digit ``1'' with character ``I''. These results are quite reasonable as these pairs have very similar shape and even some human can get confused by them.
 
 \begin{figure}[h!]
     \centering
@@ -214,7 +214,7 @@ The confusion matrix of the best model on the testing dataset is shown in Figure
 
 \subsection*{Q4.1}
 
-The first assumption made is that each character is connected within itself and well separate from others, which means the method could fail if a character is splitted by background pixels or is connected to others by foreground pixels. Some examples where the method could fail are shown in Figure.~\ref{fig:q4.1} (a).
+The first assumption made is that each character is connected within itself and well separate from others, although the morphological operations can help this to some extend. This means the method could fail if a character is splitted by background pixels or is connected to others by foreground pixels. Some examples where the method could fail are shown in Figure.~\ref{fig:q4.1} (a).
 
 The second assumption is that all character are written in the upright form (no large rotation is applied), each line of text is written horizontallly and text is written line by line. The method could fail if the text are written with large rotation, as shown in Figure.~\ref{fig:q4.1} (b).
 
@@ -237,7 +237,7 @@ The second assumption is that all character are written in the upright form (no 
 
 \subsection*{Q4.3}
 
-The character detection results are shown in Figure.~\ref{fig:q4.3}. Note that the bounding boxes are directly estimate from the connected pixels and thus they are not padded by now. And we can see that all characters and digits are successfully detected and located.
+The character detection results are shown in Figure.~\ref{fig:q4.3}. Note that the bounding boxes are directly estimate from the connected pixels and thus they are not padded by now. And we can see that all characters and digits are successfully detected and located, which means the accuracy of \code{findLetters(..)} is $100\%$.
 
 \begin{figure}[h!]
     \begin{subfigure}{.495\textwidth}
@@ -308,7 +308,8 @@ Accuracy: 0.829
 
 The plotted training loss is shown in Figure.~\ref{fig:q5.2}.
 
-As training process progresses, the training loss first drops quickly and then plateau at the low level.
+As training process progresses, the training loss first drops quickly and then plateau at the low level. The overall training loss curve is very smooth.
+This shows the momentum used in gradient descent can help speed up the loss reduction process.
 
 \begin{figure}[h!]
     \centering
@@ -334,7 +335,7 @@ The validation images and their reconstructions results are shown in Figure.~\re
 
 \subsection*{Q5.3.2}
 
-The average PSNR over the validation set is 16.084.
+The average PSNR over the validation set is 16.085.
 
 \newpage
 
@@ -348,8 +349,10 @@ The average PSNR over the validation set is 16.084.
 \newcommand{\bV}{\mathbf{V}}
 \newcommand{\bv}{\mathbf{v}}
 \newcommand{\bS}{\mathbf{S}}
+\newcommand{\bP}{\mathbf{P}}
 
-\textbf{Note} in this question, I treat the dimension of the data matrix to be (number of features, number of datapoints), and thus during the whole deduction, the dimension is the transpose of the that in implementation.
+\textbf{Note} in this theory question, I treat the dimension of the data matrix to be (number of features, number of datapoints), and thus during the whole deduction, the dimension is the transpose of default setting in implementation.
+% The final dimension of the projection matrix should be the same ($32\times1024$) but will differ in terms of left- or right-multiply.
 
 Suppose our data matrix is $\bA \in \mathbb{R}^{M\times N}$, where $N$ is the number of data points in the dataset and $M$ is number of dimension for each data point (here is the number of pixels in each image). Then each column of $\bX$ is a datapoint, and consider the SVD decomposition
 \begin{align} \label{eq:SVD}
@@ -372,10 +375,10 @@ where the principle components $\bX$ and the compressed data matrix $\bC$ are de
 \end{align}
 where each column of $\bC$ is a compressed representation of the original data point in the corresponding column of $\bA$.
 
-To get $\bC$ for any other input $\bA'$, we can simply simply calculate $\bX^T\bA'$, where we can define $\bX^T$ as the projection matrix
-In our case, $M=1024$ and $k=32$, and thus the size of the projection matrix $\bX^T$ is $(1024 \times 32)$ and its rank is 32.
+To get $\bC$ for any other input $\bA'$, we can simply simply calculate $\bX^T\bA'$, where we can define $\bP = \bX^T$ as the projection matrix
+In our case, $M=1024$ and $k=32$, and thus the size of the projection matrix $\bP$ is $(32 \times 1024)$ and its rank is 32.
 
-\textbf{Note}: In the case where the first dimension is the number of datapoint (as in our implementation), the shape of the projection matrix will be $(32 \times 1024)$ and needs to be right-multiplied to the input data matrix.
+\textbf{Note}: In the case where the first dimension is the number of datapoint (as in our implementation), the shape of the projection matrix will be $(1024 \times 32)$ and needs to be right-multiplied to the input data matrix.
 
 \newpage
 
@@ -383,7 +386,7 @@ In our case, $M=1024$ and $k=32$, and thus the size of the projection matrix $\b
 
 The validation images and their reconstructions results using PCA are shown in Figure.~\ref{fig:q5.3.1}. As we can see, besides that the output are blur, the reconstructed images are generally more gray.
 
-The average PSNR over the validation set is 16.347.
+The average PSNR over the validation set is 16.347, which is higher than that obtained from Autoencoder, and means better reconstruction quality.
 
 \begin{figure}[h!]
     \centering
@@ -437,7 +440,7 @@ The loss and accuracy during the training process is show in Figure.~\ref{fig:q7
 \newpage
 \subsection*{Q7.1.4}
 
-For this question, please run \code{python run\_q7\_1.py 7.1.4 train} to train the CNN on EMNIST Balanced dataset and \code{python run\_q7\_1.py 7.1.4 train} to test the trained CNN on the texts detected and cropped from the given 4 images.
+For this question, please run \code{python run\_q7\_1.py 7.1.4 train} to train the CNN on EMNIST Balanced dataset and \code{python run\_q7\_1.py 7.1.4 test} to test the trained CNN on the texts detected and cropped from the given 4 images.
 
 The loss and accuracy during the training process is show in Figure.~\ref{fig:q7.1.4}. The test results and accuracy on the text given by findLetters is shown as follows:
 
@@ -497,7 +500,7 @@ In this question, I designed a small CNN containing 3 convolution layers with Re
 The training progress of above experiment are shown in Figure.~\ref{fig:q7.2.1} and Figure.~\ref{fig:q7.2.2}.
 As we can see from those figures, the network based on pretrained SqueezeNet yeild faster training progress and better training results than the small CNN trained from scratch.
 Moreover, interestingly, during finetuning the SqueezeNet, we can notice a slowdown around epoch 5.
-This is probably because at first, the pretrained network contains bias and it takes some time to overcome them and reach a general distribution.
+% This is probably because at first, the pretrained network contains bias and it takes some time to overcome them and reach a general distribution.
 
 \begin{figure}[h!]
     \begin{subfigure}{.495\textwidth}

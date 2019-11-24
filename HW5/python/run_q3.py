@@ -178,7 +178,7 @@ def visualizeWeights(W):
                      )
     ws = [w.reshape((32,32)) for w in W.T]
     for ax, im in zip(grid, ws):
-        ax.imshow(im)
+        ax.imshow(im, cmap="gray")
         ax.set_xticks([])
         ax.set_yticks([])
 

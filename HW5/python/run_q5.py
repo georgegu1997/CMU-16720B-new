@@ -27,6 +27,7 @@ params = Counter()
 # initialize layers here
 ##########################
 ##### your code here #####
+'''The definition of the AutoEncoder network'''
 class AutoEncoder():
     def __init__(self, params={}, input_size=1024, hidden_size=32, output_size=1024):
         self.input_size = input_size
@@ -56,6 +57,7 @@ class AutoEncoder():
         dx = backwards(dh1, self.params, "input", relu_deriv)
         return dx
 
+'''forward and backward function for total square error'''
 def totalSquaredError(y, out):
     diff = (out-y)
     diffsq = diff**2
@@ -68,6 +70,7 @@ def totalSquaredErrorBackward(loss, cache):
     dout = 2*(out-y)
     return dout
 
+'''SGD and momentum optimization'''
 def sgdOptimize(params, learning_rate):
     for k,v in sorted(list(params.items())):
         if 'grad' in k:
@@ -109,7 +112,7 @@ for itr in range(max_iters):
         # forward
         out = ae.forward(xb)
         loss, error_cache = totalSquaredError(xb, out)
-        total_loss += loss
+        total_loss += loss / batch_size
 
         # backward
         dout = totalSquaredErrorBackward(loss, error_cache)
@@ -132,12 +135,12 @@ params = ae.params
 import matplotlib.pyplot as plt
 # visualize some results
 
-# # Plot the training losses
-# plt.plot(epoch_list, train_loss_list)
-# plt.title("Training loss")
-# plt.xlabel("Epoch")
-# plt.ylabel("Loss")
-# plt.show()
+# Plot the training losses
+plt.plot(epoch_list, train_loss_list)
+plt.title("Training loss")
+plt.xlabel("Epoch")
+plt.ylabel("Loss")
+plt.show()
 
 ##########################
 ##### your code here #####
@@ -170,7 +173,7 @@ from skimage.measure import compare_psnr as psnr
 # evaluate PSNR
 ##########################
 ##### your code here #####
-total_psnr = 0
+total_psnr = 0.0
 for x in valid_x:
     recon = ae.forward(x)
     im = x.reshape((32, 32))

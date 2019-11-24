@@ -121,7 +121,7 @@ def main():
             rect = matplotlib.patches.Rectangle((minc, minr), maxc - minc, maxr - minr,
                                     fill=False, edgecolor='red', linewidth=2)
             plt.gca().add_patch(rect)
-        # plt.show()
+        plt.show()
         # find the rows using..RANSAC, counting, clustering, etc.
         ##########################
         ##### your code here #####
