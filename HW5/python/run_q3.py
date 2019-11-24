@@ -61,7 +61,7 @@ def trainAndProgress(learning_rate = 2e-3, params = {}, max_iters = max_iters):
             # loss
             loss, acc = compute_loss_and_acc(yb, probs)
             # be sure to add loss and accuracy to epoch totals
-            total_loss += loss
+            total_loss += loss / batch_size
             total_acc += acc / batch_num
 
             # backward
@@ -178,7 +178,7 @@ def visualizeWeights(W):
                      )
     ws = [w.reshape((32,32)) for w in W.T]
     for ax, im in zip(grid, ws):
-        ax.imshow(im)
+        ax.imshow(im, cmap="gray")
         ax.set_xticks([])
         ax.set_yticks([])
 
@@ -214,7 +214,7 @@ def constructConfusionMatrix(params, x, y):
         m[i, j] += 1
     return m
 
-confusion_matrix = constructConfusionMatrix(params, valid_x, valid_y)
+confusion_matrix = constructConfusionMatrix(params, test_x, test_y)
 ##########################
 
 import string

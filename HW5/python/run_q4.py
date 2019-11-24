@@ -103,7 +103,7 @@ def evaluateOCRResults(text_by_line, gt):
     correct_num, total_num = 0.0, 0.0
     for line, line_gt in zip(text_by_line, gt):
         print(line)
-        print(line_gt)
+        # print(line_gt)
         for l, lgt in zip(line, line_gt):
             if l == lgt:
                 correct_num +=1
@@ -121,7 +121,7 @@ def main():
             rect = matplotlib.patches.Rectangle((minc, minr), maxc - minc, maxr - minr,
                                     fill=False, edgecolor='red', linewidth=2)
             plt.gca().add_patch(rect)
-        # plt.show()
+        plt.show()
         # find the rows using..RANSAC, counting, clustering, etc.
         ##########################
         ##### your code here #####

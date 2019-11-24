@@ -15,18 +15,43 @@ dim = 32
 # do PCA
 ##########################
 ##### your code here #####
-U, S, Vh = np.linalg.svd(train_x.T)
+class PCA():
+    def __init__(self):
+        pass
+
+    '''A is of shape (num datapoints, num features)'''
+    def train(self, A, dim):
+        self.dim = dim
+        A = A.T
+        self.mean = A.mean(axis=1, keepdims=True)
+        A -= self.mean
+        U, S, Vh = np.linalg.svd(A)
+        self.X = U[:, :dim] # principle components
+        self.P = self.X.T # projection matrix
+
+    def project(self, A):
+        A = A.T
+        lrank = self.P.dot(A - self.mean)
+        return lrank.T
+
+    '''A is of shape (num features, num datapoints)'''
+    def projectAndRecon(self, A):
+        A = A.T
+        lrank = self.P.dot(A - self.mean)
+        recon = self.X.dot(lrank)
+        recon += self.mean
+        return recon.T
+
+pca = PCA()
+pca.train(train_x, dim=dim)
 ##########################
 
 # rebuild a low-rank version
 lrank = None
 ##########################
 ##### your code here #####
-X = U[:, :dim] # principle components
-P = X.T # projection matrix
-C = np.diag(S[:dim]).dot(Vh[:dim]) # low-rank representation
-lrank = C.T
-print("projection matrix:", P.shape)
+print("projection matrix:", pca.P.shape)
+lrank = pca.project(train_x)
 print("low rank representation:", lrank.shape)
 ##########################
 
@@ -34,8 +59,7 @@ print("low rank representation:", lrank.shape)
 recon = None
 ##########################
 ##### your code here #####
-recon_train_x = X.dot(C)
-recon = recon_train_x.T
+recon = pca.projectAndRecon(train_x)
 print("recon_train:", recon.shape)
 ##########################
 
@@ -43,9 +67,7 @@ print("recon_train:", recon.shape)
 recon_valid = None
 ##########################
 ##### your code here #####
-lrank_valid_x = P.dot(valid_x.T)
-recon_valid_x = X.dot(lrank_valid_x)
-recon_valid = recon_valid_x.T
+recon_valid = pca.projectAndRecon(valid_x)
 print("recon_valid:", recon_valid.shape)
 ##########################
 
@@ -59,7 +81,7 @@ for i, c in enumerate(selected_classes):
     # print((valid_y[:, c] == 1).sum())
     x_c = valid_x[valid_y[:, c] == 1]
     selected_x = x_c[np.random.choice(np.arange(x_c.shape[0]), 2)]
-    recon_x = X.dot(P.dot(selected_x.T)).T
+    recon_x = pca.projectAndRecon(selected_x)
     axes[i, 0].imshow(selected_x[0].reshape((32,32)).T, cmap="gray")
     axes[i, 1].imshow(recon_x[0].reshape((32,32)).T, cmap="gray")
     axes[i, 2].imshow(selected_x[1].reshape((32,32)).T, cmap="gray")
